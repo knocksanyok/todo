@@ -5,6 +5,11 @@ import './App.css'
 
 function App() {
 	const [count, setCount] = useState(0)
+	console.log({ count })
+
+	const [text, setText] = useState('')
+	console.log({ text })
+
 	return (
 		<>
 			<div>
@@ -18,6 +23,8 @@ function App() {
 			<h1>Vite + React</h1>
 			<div className="card">
 				<button onClick={() => setCount((count) => count + 1)}>count is {count} clicked!</button>
+				<input value={text} onChange={(e) => setText(e.target.value)} />
+				<p>Typed text: {text}</p>
 				<p>
 					Edit <code>src/App.tsx</code> and save to test HMR
 				</p>
