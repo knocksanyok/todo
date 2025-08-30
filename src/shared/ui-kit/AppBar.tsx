@@ -5,9 +5,11 @@ import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import MenuIcon from '@mui/icons-material/Menu'
-import { Avatar, Stack, Tooltip } from '@mui/material'
+import { Avatar, Stack, Tooltip, useColorScheme } from '@mui/material'
 
 const ButtonAppBar = () => {
+	const { mode, setMode } = useColorScheme()
+
 	return (
 		<Box sx={{ flexGrow: 1 }}>
 			<AppBar position="fixed">
@@ -23,6 +25,9 @@ const ButtonAppBar = () => {
 							About
 						</Typography>
 					</Stack>
+					<Button color="inherit" onClick={() => setMode(mode === 'light' ? 'dark' : 'light')}>
+						Theme Switcher
+					</Button>
 					<Button color="inherit">Login</Button>
 					<Tooltip title="User">
 						<Avatar src={''} />

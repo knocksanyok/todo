@@ -4,6 +4,7 @@ import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 
 import './App.css'
+
 import AppBar from '../shared/ui-kit/AppBar.tsx'
 
 function App() {
