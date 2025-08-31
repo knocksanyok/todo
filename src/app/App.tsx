@@ -6,9 +6,8 @@ import '@fontsource/roboto/700.css'
 import './App.css'
 
 import AppBar from '../shared/ui-kit/AppBar.tsx'
-import { Container, InputAdornment, Stack, TextField } from '@mui/material'
+import { Container, InputAdornment, Stack, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material'
 import { AccountCircle } from '@mui/icons-material'
-import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import { type SyntheticEvent, useState } from 'react'
 
@@ -16,7 +15,8 @@ function App() {
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 	const [loading, setLoading] = useState(false)
-	const [isLoginForm, setIsLoginForm] = useState(true)
+
+	const [loginFormName, setloginFormName] = useState('login')
 
 	const handleUserNameChange = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) =>
 		setUsername(e.currentTarget.value)
@@ -31,12 +31,31 @@ function App() {
 		}, 2000)
 	}
 
+	const handleChange = (_event: React.MouseEvent<HTMLElement>, newAlignment: string) => {
+		setloginFormName(newAlignment)
+	}
+
 	return (
 		<>
 			<AppBar />
 			<div style={{ marginTop: '100px' }} />
-			{isLoginForm ? (
-				<Container maxWidth={'sm'}>
+
+			<Container maxWidth={'sm'}>
+				<ToggleButtonGroup
+					disabled={loading}
+					color="primary"
+					value={loginFormName}
+					exclusive
+					onChange={handleChange}
+					aria-label="Platform"
+					fullWidth
+					sx={{ marginBottom: 2 }}
+					size={'small'}
+				>
+					<ToggleButton value="login">Login</ToggleButton>
+					<ToggleButton value="register">Register</ToggleButton>
+				</ToggleButtonGroup>
+				{loginFormName === 'login' ? (
 					<Stack spacing={2}>
 						<TextField
 							disabled={loading}
@@ -77,9 +96,7 @@ function App() {
 							{loading ? 'Loading...' : 'Login'}
 						</Button>
 					</Stack>
-				</Container>
-			) : (
-				<Container maxWidth={'sm'}>
+				) : (
 					<Stack spacing={2}>
 						<TextField
 							disabled={loading}
@@ -117,11 +134,11 @@ function App() {
 							}}
 						/>
 						<Button onClick={handleLogin} variant={'contained'} loading={loading} loadingPosition={'start'}>
-							{loading ? 'Loading...' : 'Login'}
+							{loading ? 'Loading...' : 'Register'}
 						</Button>
 					</Stack>
-				</Container>
-			)}
+				)}
+			</Container>
 		</>
 	)
 }
