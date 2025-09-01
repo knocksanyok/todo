@@ -9,7 +9,14 @@ import { Avatar, Stack, Tooltip, useColorScheme } from '@mui/material'
 import { FormControl, RadioGroup, FormControlLabel, Radio } from '@mui/material'
 import { LightMode, DarkMode, LaptopMac } from '@mui/icons-material'
 
-const ButtonAppBar = () => {
+type Props = {
+	access_token?: string
+	username?: string
+}
+
+const ButtonAppBar = (props: Props) => {
+	const { username } = props
+
 	const { mode, setMode } = useColorScheme()
 	if (!mode) return null
 
@@ -21,9 +28,11 @@ const ButtonAppBar = () => {
 						<MenuIcon />
 					</IconButton>
 					<Stack direction={'row'} spacing={2} style={{ flexGrow: 1 }}>
-						<Typography variant="h6" component="div">
-							Todos
-						</Typography>
+						{username && (
+							<Typography variant="h6" component="div">
+								Todos
+							</Typography>
+						)}
 						<Typography variant="h6" component="div">
 							About
 						</Typography>
@@ -43,10 +52,15 @@ const ButtonAppBar = () => {
 						</RadioGroup>
 					</FormControl>
 
-					<Button color="inherit">Login</Button>
-					<Tooltip title="User">
-						<Avatar src={''} />
-					</Tooltip>
+					{username ? (
+						<Tooltip title={username}>
+							<Avatar src={''} alt={username}>
+								{username[0]}
+							</Avatar>
+						</Tooltip>
+					) : (
+						<Button color="inherit">Login</Button>
+					)}
 				</Toolbar>
 			</AppBar>
 		</Box>

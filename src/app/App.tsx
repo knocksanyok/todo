@@ -2,6 +2,7 @@ import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
+import { jwtDecode } from 'jwt-decode'
 
 import './App.css'
 
@@ -12,10 +13,10 @@ import Button from '@mui/material/Button'
 import { type SyntheticEvent, useState } from 'react'
 
 function App() {
+	const [user, setUser] = useState<{ access_token: string; username: string } | null>(null)
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 	const [loading, setLoading] = useState(false)
-
 	const [loginFormName, setloginFormName] = useState('login')
 
 	const handleUserNameChange = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) =>
@@ -24,11 +25,32 @@ function App() {
 	const handlePasswordChange = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) =>
 		setPassword(e.currentTarget.value)
 
-	const handleLogin = () => {
+	const handleLogin = async () => {
 		setLoading(true)
-		setTimeout(() => {
-			setLoading(false)
-		}, 2000)
+		const loginResponse = await fetch('https://todos-be.vercel.app/auth/login', {
+			method: 'POST',
+			body: JSON.stringify({ username: username, password: password }),
+			mode: 'cors',
+			headers: { 'Content-Type': 'application/json' },
+		})
+		const loginData = (await loginResponse.json()) as { access_token: string; username: string }
+		const accessToken = loginData.access_token
+		console.log(jwtDecode(accessToken))
+
+		localStorage.setItem('accessToken', accessToken)
+		setLoading(false)
+		setUser(loginData)
+	}
+
+	const handleRegister = async () => {
+		setLoading(true)
+		await fetch('https://todos-be.vercel.app/auth/register', {
+			method: 'POST',
+			body: JSON.stringify({ username: username, password: password }),
+			mode: 'cors',
+			headers: { 'Content-Type': 'application/json' },
+		})
+		setLoading(false)
 	}
 
 	const handleChange = (_event: React.MouseEvent<HTMLElement>, newAlignment: string) => {
@@ -37,7 +59,8 @@ function App() {
 
 	return (
 		<>
-			<AppBar />
+			<AppBar username={user?.username} />
+
 			<div style={{ marginTop: '100px' }} />
 
 			<Container maxWidth={'sm'}>
@@ -141,7 +164,7 @@ function App() {
 								}}
 							/>
 							<Button
-								onClick={handleLogin}
+								onClick={handleRegister}
 								variant={'contained'}
 								loading={loading}
 								loadingPosition={'start'}
