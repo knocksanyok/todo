@@ -8,9 +8,12 @@ import './App.css'
 
 import AppBar from '../shared/ui-kit/AppBar.tsx'
 import { Container, InputAdornment, Paper, Stack, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material'
-import { AccountCircle } from '@mui/icons-material'
+import { AccountCircle, Visibility, VisibilityOff } from '@mui/icons-material'
+import LockIcon from '@mui/icons-material/Lock'
 import Button from '@mui/material/Button'
 import { type SyntheticEvent, useState } from 'react'
+import IconButton from '@mui/material/IconButton'
+import * as React from 'react'
 
 function App() {
 	const [user, setUser] = useState<{ access_token: string; username: string } | null>(null)
@@ -57,6 +60,18 @@ function App() {
 		setloginFormName(newAlignment)
 	}
 
+	const [showPassword, setShowPassword] = React.useState(false)
+
+	const handleClickShowPassword = () => setShowPassword((show) => !show)
+
+	const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+		event.preventDefault()
+	}
+
+	const handleMouseUpPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+		event.preventDefault()
+	}
+
 	return (
 		<>
 			<AppBar username={user?.username} />
@@ -86,7 +101,7 @@ function App() {
 								value={username}
 								onChange={handleUserNameChange}
 								size="medium"
-								label="Email"
+								label="UserName"
 								variant="filled"
 								slotProps={{
 									input: {
@@ -104,13 +119,26 @@ function App() {
 								onChange={handlePasswordChange}
 								size="medium"
 								label="Password"
-								type="password"
+								type={showPassword ? 'text' : 'password'}
 								variant="filled"
 								slotProps={{
 									input: {
 										startAdornment: (
 											<InputAdornment position="start">
-												<AccountCircle />
+												<LockIcon />
+											</InputAdornment>
+										),
+										endAdornment: (
+											<InputAdornment position="end">
+												<IconButton
+													aria-label={showPassword ? 'hide the password' : 'display the password'}
+													onClick={handleClickShowPassword}
+													onMouseDown={handleMouseDownPassword}
+													onMouseUp={handleMouseUpPassword}
+													edge="end"
+												>
+													{showPassword ? <VisibilityOff /> : <Visibility />}
+												</IconButton>
 											</InputAdornment>
 										),
 									},
@@ -133,7 +161,7 @@ function App() {
 								value={username}
 								onChange={handleUserNameChange}
 								size="medium"
-								label="Email"
+								label="UserName"
 								variant="filled"
 								slotProps={{
 									input: {
@@ -151,13 +179,26 @@ function App() {
 								onChange={handlePasswordChange}
 								size="medium"
 								label="Password"
-								type="password"
+								type={showPassword ? 'password' : 'text'}
 								variant="filled"
 								slotProps={{
 									input: {
 										startAdornment: (
 											<InputAdornment position="start">
-												<AccountCircle />
+												<LockIcon />
+											</InputAdornment>
+										),
+										endAdornment: (
+											<InputAdornment position="end">
+												<IconButton
+													aria-label={showPassword ? 'hide the password' : 'display the password'}
+													onClick={handleClickShowPassword}
+													onMouseDown={handleMouseDownPassword}
+													onMouseUp={handleMouseUpPassword}
+													edge="end"
+												>
+													{showPassword ? <VisibilityOff /> : <Visibility />}
+												</IconButton>
 											</InputAdornment>
 										),
 									},
