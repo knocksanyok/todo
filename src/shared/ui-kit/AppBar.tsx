@@ -5,9 +5,10 @@ import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import MenuIcon from '@mui/icons-material/Menu'
-import { Avatar, Stack, Tooltip, useColorScheme } from '@mui/material'
-import { FormControl, RadioGroup, FormControlLabel, Radio } from '@mui/material'
-import { LightMode, DarkMode, LaptopMac } from '@mui/icons-material'
+import { Avatar, Paper, Stack, Tooltip, useColorScheme } from '@mui/material'
+
+import WbSunnyIcon from '@mui/icons-material/WbSunny'
+import BedTimeIcon from '@mui/icons-material/BedTime'
 
 const ButtonAppBar = () => {
 	const { mode, setMode } = useColorScheme()
@@ -29,19 +30,11 @@ const ButtonAppBar = () => {
 						</Typography>
 					</Stack>
 
-					<FormControl>
-						<RadioGroup
-							aria-labelledby="demo-theme-toggle"
-							name="theme-toggle"
-							row
-							value={mode}
-							onChange={(event) => setMode(event.target.value as 'system' | 'light' | 'dark')}
-						>
-							<FormControlLabel value="system" control={<Radio />} label={<LaptopMac sx={{ display: 'block' }} />} />
-							<FormControlLabel value="light" control={<Radio />} label={<LightMode sx={{ display: 'block' }} />} />
-							<FormControlLabel value="dark" control={<Radio />} label={<DarkMode sx={{ display: 'block' }} />} />
-						</RadioGroup>
-					</FormControl>
+					<Paper elevation={3}>
+						<IconButton value={mode} onClick={() => setMode(mode === 'light' ? 'dark' : 'light')}>
+							{mode === 'light' ? <WbSunnyIcon /> : <BedTimeIcon />}
+						</IconButton>
+					</Paper>
 
 					<Button color="inherit">Login</Button>
 					<Tooltip title="User">
