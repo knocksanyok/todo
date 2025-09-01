@@ -8,6 +8,7 @@ import './App.css'
 import AppBar from '../shared/ui-kit/AppBar.tsx'
 import { Container, InputAdornment, Paper, Stack, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material'
 import { AccountCircle } from '@mui/icons-material'
+import LockIcon from '@mui/icons-material/Lock'
 import Button from '@mui/material/Button'
 import { type SyntheticEvent, useState } from 'react'
 
@@ -63,7 +64,7 @@ function App() {
 								value={username}
 								onChange={handleUserNameChange}
 								size="medium"
-								label="Email"
+								label="UserName"
 								variant="filled"
 								slotProps={{
 									input: {
@@ -87,7 +88,7 @@ function App() {
 									input: {
 										startAdornment: (
 											<InputAdornment position="start">
-												<AccountCircle />
+												<LockIcon />
 											</InputAdornment>
 										),
 									},
@@ -110,7 +111,7 @@ function App() {
 								value={username}
 								onChange={handleUserNameChange}
 								size="medium"
-								label="Email"
+								label="UserName"
 								variant="filled"
 								slotProps={{
 									input: {
@@ -134,7 +135,7 @@ function App() {
 									input: {
 										startAdornment: (
 											<InputAdornment position="start">
-												<AccountCircle />
+												<LockIcon />
 											</InputAdornment>
 										),
 									},
