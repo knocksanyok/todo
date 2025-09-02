@@ -39,7 +39,7 @@ const ButtonAppBar = (props: Props) => {
 						</Typography>
 					</Stack>
 
-					<Paper elevation={3}>
+					<Paper elevation={3} sx={{ marginRight: '15px' }}>
 						<IconButton value={mode} onClick={() => setMode(mode === 'light' ? 'dark' : 'light')}>
 							{mode === 'light' ? <WbSunnyIcon /> : <BedTimeIcon />}
 						</IconButton>

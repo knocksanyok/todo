@@ -30,30 +30,66 @@ function App() {
 
 	const handleLogin = async () => {
 		setLoading(true)
-		const loginResponse = await fetch('https://todos-be.vercel.app/auth/login', {
-			method: 'POST',
-			body: JSON.stringify({ username: username, password: password }),
-			mode: 'cors',
-			headers: { 'Content-Type': 'application/json' },
-		})
-		const loginData = (await loginResponse.json()) as { access_token: string; username: string }
-		const accessToken = loginData.access_token
-		console.log(jwtDecode(accessToken))
+		try {
+			const loginResponse = await fetch('https://todos-be.vercel.app/auth/login', {
+				method: 'POST',
+				body: JSON.stringify({ username: username, password: password }),
+				mode: 'cors',
+				headers: { 'Content-Type': 'application/json' },
+			})
+			if (loginResponse.status === 200) {
+				const loginData = (await loginResponse.json()) as { access_token: string; username: string }
+				const accessToken = loginData.access_token
+				console.log(jwtDecode(accessToken))
 
-		localStorage.setItem('accessToken', accessToken)
-		setLoading(false)
-		setUser(loginData)
+				localStorage.setItem('accessToken', accessToken)
+				setLoading(false)
+				setUser(loginData)
+			} else if (loginResponse.status === 401) {
+				alert('Invalid username or password')
+				setLoading(false)
+			}
+		} catch (error) {
+			console.log(error)
+			alert('Problems with server, try again later')
+			setLoading(false)
+		}
 	}
 
 	const handleRegister = async () => {
 		setLoading(true)
-		await fetch('https://todos-be.vercel.app/auth/register', {
-			method: 'POST',
-			body: JSON.stringify({ username: username, password: password }),
-			mode: 'cors',
-			headers: { 'Content-Type': 'application/json' },
-		})
-		setLoading(false)
+		try {
+			const registerResponse = await fetch('https://todos-be.vercel.app/auth/register', {
+				method: 'POST',
+				body: JSON.stringify({ username: username, password: password }),
+				mode: 'cors',
+				headers: { 'Content-Type': 'application/json' },
+			})
+
+			if (registerResponse.status === 201) {
+				alert('Sucсsefully registered')
+				const loginResponse = await fetch('https://todos-be.vercel.app/auth/login', {
+					method: 'POST',
+					body: JSON.stringify({ username: username, password: password }),
+					mode: 'cors',
+					headers: { 'Content-Type': 'application/json' },
+				})
+				const loginData = (await loginResponse.json()) as { access_token: string; username: string }
+				const accessToken = loginData.access_token
+				console.log(jwtDecode(accessToken))
+
+				localStorage.setItem('accessToken', accessToken)
+				setLoading(false)
+				setUser(loginData)
+			} else if (registerResponse.status === 409) {
+				alert('User already exists')
+				setLoading(false)
+			}
+		} catch (error) {
+			console.log(error)
+			alert('Problems with server, try again later')
+			setLoading(false)
+		}
 	}
 
 	const handleChange = (_event: React.MouseEvent<HTMLElement>, newAlignment: string) => {
