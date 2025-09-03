@@ -54,36 +54,59 @@ const Auth = ({ setUser }: AuthProps) => {
 	const handleRegister = async () => {
 		setLoading(true)
 		try {
-			const registerResponse = await fetch('https://todos-be.vercel.app/auth/register', {
-				method: 'POST',
-				body: JSON.stringify({ username: username, password: password }),
-				mode: 'cors',
-				headers: { 'Content-Type': 'application/json' },
+			const registerData = await rootApi.post<UserType>('/auth/register', {
+				username: username,
+				password: password,
 			})
+			if (registerData.status === 201) {
+				const loginData = await rootApi.post<UserType>('/auth/login', { username: username, password: password })
 
-			if (registerResponse.status === 201) {
-				alert('Sucсsefully registered')
-				const loginResponse = await fetch('https://todos-be.vercel.app/auth/login', {
-					method: 'POST',
-					body: JSON.stringify({ username: username, password: password }),
-					mode: 'cors',
-					headers: { 'Content-Type': 'application/json' },
-				})
-				const loginData = (await loginResponse.json()) as { access_token: string; username: string }
-				const accessToken = loginData.access_token
-				console.log(jwtDecode(accessToken))
-
+				const accessToken = loginData.data.access_token
 				localStorage.setItem('accessToken', accessToken)
+				console.warn(jwtDecode(accessToken))
+
+				setUser(loginData.data)
 				setLoading(false)
-				setUser(loginData)
-			} else if (registerResponse.status === 409) {
-				alert('User already exists')
-				setLoading(false)
+				enqueueSnackbar('Registration successful', { variant: 'success' })
 			}
 		} catch (error) {
-			alert(error)
+			const axiousError = error as AxiosError<{ message: string }>
+			enqueueSnackbar(axiousError.response?.data.message || 'Unknown error', { variant: 'error' })
+			setLoading(false)
+		} finally {
 			setLoading(false)
 		}
+		// try {
+		// 	const registerResponse = await fetch('https://todos-be.vercel.app/auth/register', {
+		// 		method: 'POST',
+		// 		body: JSON.stringify({ username: username, password: password }),
+		// 		mode: 'cors',
+		// 		headers: { 'Content-Type': 'application/json' },
+		// 	})
+		//
+		// 	if (registerResponse.status === 201) {
+		// 		alert('Sucсsefully registered')
+		// 		const loginResponse = await fetch('https://todos-be.vercel.app/auth/login', {
+		// 			method: 'POST',
+		// 			body: JSON.stringify({ username: username, password: password }),
+		// 			mode: 'cors',
+		// 			headers: { 'Content-Type': 'application/json' },
+		// 		})
+		// 		const loginData = (await loginResponse.json()) as { access_token: string; username: string }
+		// 		const accessToken = loginData.access_token
+		// 		console.log(jwtDecode(accessToken))
+		//
+		// 		localStorage.setItem('accessToken', accessToken)
+		// 		setLoading(false)
+		// 		setUser(loginData)
+		// 	} else if (registerResponse.status === 409) {
+		// 		alert('User already exists')
+		// 		setLoading(false)
+		// 	}
+		// } catch (error) {
+		// 	alert(error)
+		// 	setLoading(false)
+		// }
 	}
 
 	const handleChange = (_event: React.MouseEvent<HTMLElement>, newAlignment: string) => {
