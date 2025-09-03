@@ -50,8 +50,7 @@ function App() {
 				setLoading(false)
 			}
 		} catch (error) {
-			console.log(error)
-			alert('Problems with server, try again later')
+			alert(error)
 			setLoading(false)
 		}
 	}
@@ -86,8 +85,7 @@ function App() {
 				setLoading(false)
 			}
 		} catch (error) {
-			console.log(error)
-			alert('Problems with server, try again later')
+			alert(error)
 			setLoading(false)
 		}
 	}
