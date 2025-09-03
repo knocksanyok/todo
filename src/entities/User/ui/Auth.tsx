@@ -7,6 +7,9 @@ import { type Dispatch, type SetStateAction, type SyntheticEvent, useState } fro
 import { jwtDecode } from 'jwt-decode'
 import * as React from 'react'
 import type { UserType } from '../model/userType.ts'
+import { rootApi } from '../../../shared/api/rootApi.ts'
+import { useSnackbar } from 'notistack'
+import type { AxiosError } from 'axios'
 
 type AuthProps = {
 	setUser: Dispatch<SetStateAction<UserType | null>>
@@ -17,6 +20,7 @@ const Auth = ({ setUser }: AuthProps) => {
 	const [password, setPassword] = useState('')
 	const [loading, setLoading] = useState(false)
 	const [loginFormName, setloginFormName] = useState('login')
+	const { enqueueSnackbar } = useSnackbar()
 
 	const handleClickShowPassword = () => setShowPassword((show) => !show)
 
@@ -29,26 +33,20 @@ const Auth = ({ setUser }: AuthProps) => {
 	const handleLogin = async () => {
 		setLoading(true)
 		try {
-			const loginResponse = await fetch('https://todos-be.vercel.app/auth/login', {
-				method: 'POST',
-				body: JSON.stringify({ username: username, password: password }),
-				mode: 'cors',
-				headers: { 'Content-Type': 'application/json' },
-			})
-			if (loginResponse.status === 200) {
-				const loginData = (await loginResponse.json()) as { access_token: string; username: string }
-				const accessToken = loginData.access_token
-				console.log(jwtDecode(accessToken))
+			const loginData = await rootApi.post<UserType>('/auth/login', { username: username, password: password })
 
-				localStorage.setItem('accessToken', accessToken)
-				setLoading(false)
-				setUser(loginData)
-			} else if (loginResponse.status === 401) {
-				alert('Invalid username or password')
-				setLoading(false)
-			}
+			const accessToken = loginData.data.access_token
+			localStorage.setItem('accessToken', accessToken)
+			console.warn(jwtDecode(accessToken))
+
+			setUser(loginData.data)
+			setLoading(false)
+			enqueueSnackbar('Welcome', { variant: 'success' })
 		} catch (error) {
-			alert(error)
+			const axiousError = error as AxiosError<{ message: string }>
+			enqueueSnackbar(axiousError.response?.data.message || 'Unknown error', { variant: 'error' })
+			setLoading(false)
+		} finally {
 			setLoading(false)
 		}
 	}

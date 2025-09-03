@@ -3,6 +3,7 @@ import './index.css'
 import App from './App.tsx'
 import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
+import { SnackbarProvider } from 'notistack'
 
 const theme = createTheme({
 	colorSchemes: {
@@ -11,10 +12,10 @@ const theme = createTheme({
 })
 
 createRoot(document.getElementById('root')!).render(
-	<>
+	<SnackbarProvider>
 		<ThemeProvider theme={theme}>
 			<CssBaseline />
 			<App />
 		</ThemeProvider>
-	</>
+	</SnackbarProvider>
 )
