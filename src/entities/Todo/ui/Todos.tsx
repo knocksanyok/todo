@@ -15,11 +15,21 @@ const Todo = ({ todo, setTodo }: TodoProps) => {
 	}
 	return (
 		<Card variant="outlined" sx={{ maxWidth: 200 }}>
-			<CardContent>
+			<CardContent
+				sx={{
+					display: 'grid',
+					flexDirection: 'row',
+					justifyContent: 'center',
+					alignItems: 'center',
+					gap: 3,
+				}}
+			>
 				<Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
 					{todo.title}
 				</Typography>
 				<Typography variant="body2">{todo.description}</Typography>
+				<Typography>{`Дата создания: ${new Date(todo.updatedAt).toLocaleDateString()}`}</Typography>
+				<Typography>{`Дата обновления: ${new Date(todo.createdAt).toLocaleDateString()}`}</Typography>
 			</CardContent>
 			<CardActions>
 				<Checkbox checked={todo.completed} onClick={handleCheckClick}></Checkbox>
