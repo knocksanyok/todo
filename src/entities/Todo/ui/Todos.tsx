@@ -14,7 +14,9 @@ type TodoProps = {
 const Todo = ({ todo, setTodo }: TodoProps) => {
 	const [isTitle, setIsTitle] = useState(true)
 	const [isDescription, setIsDescription] = useState(true)
-	const [value, setValue] = useState('')
+
+	const [editedTitle, setEditedTitle] = useState(todo.title)
+	const [editedDescription, setEditedDescription] = useState(todo.description)
 
 	const handleCheckClick = () => {
 		setTodo({ ...todo, completed: !todo.completed })
@@ -25,17 +27,19 @@ const Todo = ({ todo, setTodo }: TodoProps) => {
 	}
 
 	const handleTitleChangerTextField = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-		setValue(e.currentTarget.value)
-		setTodo({ ...todo, title: value, updatedAt: Date() })
+		const newValue = e.currentTarget.value
+		setEditedTitle(newValue)
+		setTodo({ ...todo, title: newValue, updatedAt: Date() })
 	}
 
 	const handleDescriptionChanger = () => {
 		setIsDescription(!isDescription)
 	}
 
-	const handleTitleChangerDescription = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-		setValue(e.currentTarget.value)
-		setTodo({ ...todo, description: value, updatedAt: Date() })
+	const handleTitleChangerDescriptionTextField = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+		const newValue = e.currentTarget.value
+		setEditedDescription(newValue)
+		setTodo({ ...todo, description: newValue, updatedAt: Date() })
 	}
 
 	return (
@@ -46,7 +50,7 @@ const Todo = ({ todo, setTodo }: TodoProps) => {
 						{todo.title}
 					</Typography>
 				) : (
-					<TextField label={todo.title} onChange={handleTitleChangerTextField}></TextField>
+					<TextField label={editedTitle} onChange={handleTitleChangerTextField}></TextField>
 				)}
 				<IconButton size="small" onClick={handleTitleChanger}>
 					<ModeEditIcon fontSize="small" />
@@ -54,7 +58,7 @@ const Todo = ({ todo, setTodo }: TodoProps) => {
 				{isDescription ? (
 					<Typography variant="body2">{todo.description}</Typography>
 				) : (
-					<TextField label={todo.description} onChange={handleTitleChangerDescription}></TextField>
+					<TextField label={editedDescription} onChange={handleTitleChangerDescriptionTextField}></TextField>
 				)}
 				<IconButton size="small" onClick={handleDescriptionChanger}>
 					<ModeEditIcon fontSize="small" />
