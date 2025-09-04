@@ -76,37 +76,6 @@ const Auth = ({ setUser }: AuthProps) => {
 		} finally {
 			setLoading(false)
 		}
-		// try {
-		// 	const registerResponse = await fetch('https://todos-be.vercel.app/auth/register', {
-		// 		method: 'POST',
-		// 		body: JSON.stringify({ username: username, password: password }),
-		// 		mode: 'cors',
-		// 		headers: { 'Content-Type': 'application/json' },
-		// 	})
-		//
-		// 	if (registerResponse.status === 201) {
-		// 		alert('Sucсsefully registered')
-		// 		const loginResponse = await fetch('https://todos-be.vercel.app/auth/login', {
-		// 			method: 'POST',
-		// 			body: JSON.stringify({ username: username, password: password }),
-		// 			mode: 'cors',
-		// 			headers: { 'Content-Type': 'application/json' },
-		// 		})
-		// 		const loginData = (await loginResponse.json()) as { access_token: string; username: string }
-		// 		const accessToken = loginData.access_token
-		// 		console.log(jwtDecode(accessToken))
-		//
-		// 		localStorage.setItem('accessToken', accessToken)
-		// 		setLoading(false)
-		// 		setUser(loginData)
-		// 	} else if (registerResponse.status === 409) {
-		// 		alert('User already exists')
-		// 		setLoading(false)
-		// 	}
-		// } catch (error) {
-		// 	alert(error)
-		// 	setLoading(false)
-		// }
 	}
 
 	const handleChange = (_event: React.MouseEvent<HTMLElement>, newAlignment: string) => {

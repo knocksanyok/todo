@@ -2,7 +2,7 @@ import { Card, CardActions, CardContent, Checkbox, Stack, TextField } from '@mui
 import Typography from '@mui/material/Typography'
 import type { TodoType } from '../model/todoType.ts'
 import { mockTodos } from '../model/mockTodos.ts'
-import { useState } from 'react'
+import { type SyntheticEvent, useState } from 'react'
 import IconButton from '@mui/material/IconButton'
 import ModeEditIcon from '@mui/icons-material/ModeEdit'
 
@@ -14,6 +14,7 @@ type TodoProps = {
 const Todo = ({ todo, setTodo }: TodoProps) => {
 	const [isTitle, setIsTitle] = useState(true)
 	const [isDescription, setIsDescription] = useState(true)
+	const [value, setValue] = useState('')
 
 	const handleCheckClick = () => {
 		setTodo({ ...todo, completed: !todo.completed })
@@ -23,8 +24,18 @@ const Todo = ({ todo, setTodo }: TodoProps) => {
 		setIsTitle(!isTitle)
 	}
 
+	const handleTitleChangerTextField = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+		setValue(e.currentTarget.value)
+		setTodo({ ...todo, title: value, updatedAt: Date() })
+	}
+
 	const handleDescriptionChanger = () => {
 		setIsDescription(!isDescription)
+	}
+
+	const handleTitleChangerDescription = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+		setValue(e.currentTarget.value)
+		setTodo({ ...todo, description: value, updatedAt: Date() })
 	}
 
 	return (
@@ -35,17 +46,21 @@ const Todo = ({ todo, setTodo }: TodoProps) => {
 						{todo.title}
 					</Typography>
 				) : (
-					<TextField></TextField>
+					<TextField label={todo.title} onChange={handleTitleChangerTextField}></TextField>
 				)}
 				<IconButton size="small" onClick={handleTitleChanger}>
 					<ModeEditIcon fontSize="small" />
 				</IconButton>
-				{isDescription ? <Typography variant="body2">{todo.description}</Typography> : <TextField></TextField>}
+				{isDescription ? (
+					<Typography variant="body2">{todo.description}</Typography>
+				) : (
+					<TextField label={todo.description} onChange={handleTitleChangerDescription}></TextField>
+				)}
 				<IconButton size="small" onClick={handleDescriptionChanger}>
 					<ModeEditIcon fontSize="small" />
 				</IconButton>
-				<Typography>{`Дата создания: ${new Date(todo.updatedAt).toLocaleDateString()}`}</Typography>
-				<Typography>{`Дата обновления: ${new Date(todo.createdAt).toLocaleDateString()}`}</Typography>
+				<Typography>{`Дата создания: ${new Date(todo.createdAt).toLocaleDateString()}`}</Typography>
+				<Typography>{`Дата обновления: ${new Date(todo.updatedAt).toLocaleDateString()}`}</Typography>
 			</CardContent>
 			<CardActions>
 				<Checkbox checked={todo.completed} onClick={handleCheckClick}></Checkbox>
