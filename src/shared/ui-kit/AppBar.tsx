@@ -9,17 +9,26 @@ import { Avatar, Paper, Stack, Tooltip, useColorScheme } from '@mui/material'
 
 import WbSunnyIcon from '@mui/icons-material/WbSunny'
 import BedTimeIcon from '@mui/icons-material/BedTime'
+import type { UserType } from '../../entities/User/model/userType.ts'
+import type { Dispatch, SetStateAction } from 'react'
 
 type Props = {
 	access_token?: string
 	username?: string
+	setUser: Dispatch<SetStateAction<UserType | null>>
 }
 
 const ButtonAppBar = (props: Props) => {
 	const { username } = props
+	const { setUser } = props
 
 	const { mode, setMode } = useColorScheme()
 	if (!mode) return null
+
+	const handleLogout = () => {
+		localStorage.removeItem('accessToken')
+		setUser(null)
+	}
 
 	return (
 		<Box sx={{ flexGrow: 1 }}>
@@ -46,11 +55,16 @@ const ButtonAppBar = (props: Props) => {
 					</Paper>
 
 					{username ? (
-						<Tooltip title={username}>
-							<Avatar src={''} alt={username}>
-								{username[0]}
-							</Avatar>
-						</Tooltip>
+						<Stack direction={'row'} spacing={1}>
+							<Tooltip title={username}>
+								<Avatar src={''} alt={username}>
+									{username[0]}
+								</Avatar>
+							</Tooltip>
+							<Button color="inherit" variant="outlined" onClick={handleLogout}>
+								Logout
+							</Button>
+						</Stack>
 					) : (
 						<Button color="inherit">Login</Button>
 					)}

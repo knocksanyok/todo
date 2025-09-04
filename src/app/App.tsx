@@ -18,7 +18,7 @@ function App() {
 
 	return (
 		<>
-			<AppBar username={user?.username} />
+			<AppBar username={user?.username} setUser={setUser} />
 
 			<div style={{ marginTop: '100px' }} />
 
