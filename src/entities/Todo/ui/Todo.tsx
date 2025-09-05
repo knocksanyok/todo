@@ -6,17 +6,23 @@ import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import ModeEditIcon from '@mui/icons-material/ModeEdit'
 import DoneIcon from '@mui/icons-material/Done'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import { useTodosStore } from '../model/store/use TodosStore.ts'
 
 type TodoProps = {
 	todo: TodoType
 	setTodo: (todo: TodoType) => void
 }
+
 export const Todo = ({ todo, setTodo }: TodoProps) => {
 	const [isTitle, setIsTitle] = useState(true)
 	const [isDescription, setIsDescription] = useState(true)
 
 	const [editedTitle, setEditedTitle] = useState(todo.title)
 	const [editedDescription, setEditedDescription] = useState(todo.description)
+
+	const todos = useTodosStore((state) => state.todos)
+	const removeTodo = useTodosStore((state) => state.removeTodo)
 
 	const handleCheckClick = () => {
 		setTodo({ ...todo, completed: !todo.completed })
@@ -50,6 +56,11 @@ export const Todo = ({ todo, setTodo }: TodoProps) => {
 	const DoneEditDescription = () => {
 		setIsDescription(!isDescription)
 		enqueueSnackbar('Описание успешно обновлено!', { variant: 'success' })
+	}
+
+	const handleRemoveTodo = () => {
+		const updatedTodos = todos.filter((t) => t._id !== todo._id)
+		removeTodo(updatedTodos)
 	}
 
 	const { enqueueSnackbar } = useSnackbar()
@@ -95,6 +106,9 @@ export const Todo = ({ todo, setTodo }: TodoProps) => {
 			<CardActions>
 				<Checkbox checked={todo.completed} onClick={handleCheckClick}></Checkbox>
 			</CardActions>
+			<IconButton size="small" onClick={handleRemoveTodo}>
+				<DeleteOutlineIcon fontSize="small" />
+			</IconButton>
 		</Card>
 	)
 }
