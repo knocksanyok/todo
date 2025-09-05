@@ -5,6 +5,8 @@ import { mockTodos } from '../model/mockTodos.ts'
 import { type SyntheticEvent, useState } from 'react'
 import IconButton from '@mui/material/IconButton'
 import ModeEditIcon from '@mui/icons-material/ModeEdit'
+import DoneIcon from '@mui/icons-material/Done'
+import { useSnackbar } from 'notistack'
 
 type TodoProps = {
 	todo: TodoType
@@ -42,27 +44,53 @@ const Todo = ({ todo, setTodo }: TodoProps) => {
 		setTodo({ ...todo, description: newValue, updatedAt: Date() })
 	}
 
+	const DoneEditTitle = () => {
+		setIsTitle(!isTitle)
+		enqueueSnackbar('Заголовок успешно обновлен!', { variant: 'success' })
+	}
+
+	const DoneEditDescription = () => {
+		setIsDescription(!isDescription)
+		enqueueSnackbar('Описание успешно обновлено!', { variant: 'success' })
+	}
+
+	const { enqueueSnackbar } = useSnackbar()
+
 	return (
 		<Card variant="outlined" sx={{ maxWidth: 200 }}>
 			<CardContent>
 				{isTitle ? (
-					<Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
-						{todo.title}
-					</Typography>
+					<>
+						<Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
+							{todo.title}
+						</Typography>
+						<IconButton size="small" onClick={handleTitleChanger}>
+							<ModeEditIcon fontSize="small" />
+						</IconButton>
+					</>
 				) : (
-					<TextField label={editedTitle} onChange={handleTitleChangerTextField}></TextField>
+					<>
+						<TextField label={editedTitle} onChange={handleTitleChangerTextField}></TextField>
+						<IconButton size="small" onClick={DoneEditTitle}>
+							<DoneIcon fontSize="small" />
+						</IconButton>
+					</>
 				)}
-				<IconButton size="small" onClick={handleTitleChanger}>
-					<ModeEditIcon fontSize="small" />
-				</IconButton>
 				{isDescription ? (
-					<Typography variant="body2">{todo.description}</Typography>
+					<>
+						<Typography variant="body2">{todo.description}</Typography>
+						<IconButton size="small" onClick={handleDescriptionChanger}>
+							<ModeEditIcon fontSize="small" />
+						</IconButton>
+					</>
 				) : (
-					<TextField label={editedDescription} onChange={handleTitleChangerDescriptionTextField}></TextField>
+					<>
+						<TextField label={editedDescription} onChange={handleTitleChangerDescriptionTextField}></TextField>
+						<IconButton size="small" onClick={DoneEditDescription}>
+							<DoneIcon fontSize="small" />
+						</IconButton>
+					</>
 				)}
-				<IconButton size="small" onClick={handleDescriptionChanger}>
-					<ModeEditIcon fontSize="small" />
-				</IconButton>
 				<Typography>{`Дата создания: ${new Date(todo.createdAt).toLocaleDateString()}`}</Typography>
 				<Typography>{`Дата обновления: ${new Date(todo.updatedAt).toLocaleDateString()}`}</Typography>
 			</CardContent>
