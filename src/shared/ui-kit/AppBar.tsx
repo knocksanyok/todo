@@ -11,6 +11,7 @@ import WbSunnyIcon from '@mui/icons-material/WbSunny'
 import BedTimeIcon from '@mui/icons-material/BedTime'
 import type { UserType } from '../../entities/User/model/userType.ts'
 import type { Dispatch, SetStateAction } from 'react'
+import { useTodosStore } from '../../entities/Todo/model/store/use TodosStore.ts'
 
 type Props = {
 	access_token?: string
@@ -19,6 +20,9 @@ type Props = {
 }
 
 const ButtonAppBar = (props: Props) => {
+	const todos = useTodosStore((state) => state.todos)
+	const undoneTodos = todos.filter((todo) => !todo.completed)
+
 	const { username } = props
 	const { setUser } = props
 
@@ -40,7 +44,7 @@ const ButtonAppBar = (props: Props) => {
 					<Stack direction={'row'} spacing={2} style={{ flexGrow: 1 }}>
 						{username && (
 							<Typography variant="h6" component="div">
-								Todos
+								Todos{' ' + undoneTodos.length}
 							</Typography>
 						)}
 						<Typography variant="h6" component="div">
