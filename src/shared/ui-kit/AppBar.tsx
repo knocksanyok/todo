@@ -10,7 +10,7 @@ import { Avatar, Paper, Stack, Tooltip, useColorScheme } from '@mui/material'
 import WbSunnyIcon from '@mui/icons-material/WbSunny'
 import BedTimeIcon from '@mui/icons-material/BedTime'
 import type { UserType } from '../../entities/User/model/userType.ts'
-import type { Dispatch, SetStateAction } from 'react'
+import { type Dispatch, type SetStateAction } from 'react'
 import { useTodosStore } from '../../entities/Todo/model/store/use TodosStore.ts'
 
 type Props = {
@@ -19,12 +19,13 @@ type Props = {
 	setUser: Dispatch<SetStateAction<UserType | null>>
 }
 
-const ButtonAppBar = (props: Props) => {
+const ButtonAppBar = ({ username, setUser }: Props) => {
 	const todos = useTodosStore((state) => state.todos)
 	const undoneTodos = todos.filter((todo) => !todo.completed)
 
-	const { username } = props
-	const { setUser } = props
+	// const {access_token} = props
+	// const { username } = props
+	// const { setUser } = props
 
 	const { mode, setMode } = useColorScheme()
 	if (!mode) return null

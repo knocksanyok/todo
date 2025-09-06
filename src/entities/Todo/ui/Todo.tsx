@@ -21,7 +21,6 @@ export const Todo = ({ todo, setTodo }: TodoProps) => {
 	const [editedTitle, setEditedTitle] = useState(todo.title)
 	const [editedDescription, setEditedDescription] = useState(todo.description)
 
-	const todos = useTodosStore((state) => state.todos)
 	const removeTodo = useTodosStore((state) => state.removeTodo)
 
 	const handleCheckClick = () => {
@@ -59,8 +58,13 @@ export const Todo = ({ todo, setTodo }: TodoProps) => {
 	}
 
 	const handleRemoveTodo = () => {
-		const updatedTodos = todos.filter((t) => t._id !== todo._id)
-		removeTodo(updatedTodos)
+		const todoForDelete = todo._id
+		removeTodo(todoForDelete)
+		console.log(todoForDelete)
+
+		// const updatedTodos = todos.filter((t) => t._id === todo._id)
+		// const todoForDelete = updatedTodos[0]._id
+		// removeTodo(updatedTodos)
 	}
 
 	const { enqueueSnackbar } = useSnackbar()
