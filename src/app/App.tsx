@@ -6,23 +6,20 @@ import '@fontsource/roboto/700.css'
 import './App.css'
 
 import AppBar from '../shared/ui-kit/AppBar.tsx'
-import { useState } from 'react'
 import Auth from '../entities/User/ui/Auth.tsx'
-import type { UserType } from '../entities/User/model/userType.ts'
 import Todos from '../entities/Todo/ui/Todos.tsx'
-import { autoLogin } from '../shared/util /autoLogin.ts'
+import { useUserStore } from '../entities/User/model/provider/userContext.tsx'
 
 function App() {
-	const userFromLS = autoLogin()
-	const [user, setUser] = useState<UserType | null>(userFromLS)
+	const { user } = useUserStore()
 
 	return (
 		<>
-			<AppBar username={user?.username} setUser={setUser} />
+			<AppBar />
 
 			<div style={{ marginTop: '100px' }} />
 
-			{user ? <Todos /> : <Auth setUser={setUser} />}
+			{user ? <Todos /> : <Auth />}
 		</>
 	)
 }

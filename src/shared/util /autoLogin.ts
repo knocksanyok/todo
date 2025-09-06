@@ -12,12 +12,12 @@ export const autoLogin = () => {
 			}
 
 			localStorage.removeItem('accessToken')
-			return null
+			return undefined
 		} catch (error) {
 			console.error(error)
 			localStorage.removeItem('accessToken')
-			return null
+			return undefined
 		}
 	}
-	return null
+	return undefined
 }
