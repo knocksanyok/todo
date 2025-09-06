@@ -11,7 +11,7 @@ import WbSunnyIcon from '@mui/icons-material/WbSunny'
 import BedTimeIcon from '@mui/icons-material/BedTime'
 import type { UserType } from '../../entities/User/model/userType.ts'
 import { type Dispatch, type SetStateAction } from 'react'
-import { useTodosStore } from '../../entities/Todo/model/store/use TodosStore.ts'
+import { useTodosStore } from '../../entities/Todo/model/store/useTodosStore.ts'
 
 type Props = {
 	access_token?: string

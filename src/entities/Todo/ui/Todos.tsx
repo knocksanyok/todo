@@ -1,5 +1,5 @@
 import { Container, Input, Stack } from '@mui/material'
-import { useTodosStore } from '../model/store/use TodosStore.ts'
+import { useTodosStore } from '../model/store/useTodosStore.ts'
 import { Todo } from './Todo.tsx'
 import { type ChangeEvent, useState } from 'react'
 import Button from '@mui/material/Button'
