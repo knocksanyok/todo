@@ -11,19 +11,6 @@ const Todos = () => {
 
 	const todos = useTodosStore((state) => state.todos)
 	const addTodos = useTodosStore((state) => state.addTodo)
-	const setTodos = useTodosStore((state) => state.setTodos)
-
-	console.log(todos)
-
-	const setTodo = (todo: TodoType) => {
-		const updatedTodos = todos.map((t) => {
-			if (t._id === todo._id) {
-				return todo
-			}
-			return t
-		})
-		setTodos(updatedTodos)
-	}
 
 	const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setNewTodoTitle(e.target.value)
@@ -56,7 +43,7 @@ const Todos = () => {
 
 			<Stack flexWrap={'wrap'} spacing={2} direction={'row'}>
 				{todos.map((todo) => {
-					return <Todo todo={todo} key={todo._id} setTodo={setTodo} />
+					return <Todo todo={todo} />
 				})}
 			</Stack>
 		</Container>

@@ -11,10 +11,9 @@ import { useTodosStore } from '../model/store/useTodosStore.ts'
 
 type TodoProps = {
 	todo: TodoType
-	setTodo: (todo: TodoType) => void
 }
 
-export const Todo = ({ todo, setTodo }: TodoProps) => {
+export const Todo = ({ todo }: TodoProps) => {
 	const [isTitle, setIsTitle] = useState(true)
 	const [isDescription, setIsDescription] = useState(true)
 
@@ -22,6 +21,7 @@ export const Todo = ({ todo, setTodo }: TodoProps) => {
 	const [editedDescription, setEditedDescription] = useState(todo.description)
 
 	const removeTodo = useTodosStore((state) => state.removeTodo)
+	const setTodo = useTodosStore((state) => state.setTodo)
 
 	const handleCheckClick = () => {
 		setTodo({ ...todo, completed: !todo.completed })
@@ -60,11 +60,6 @@ export const Todo = ({ todo, setTodo }: TodoProps) => {
 	const handleRemoveTodo = () => {
 		const todoForDelete = todo._id
 		removeTodo(todoForDelete)
-		console.log(todoForDelete)
-
-		// const updatedTodos = todos.filter((t) => t._id === todo._id)
-		// const todoForDelete = updatedTodos[0]._id
-		// removeTodo(updatedTodos)
 	}
 
 	const { enqueueSnackbar } = useSnackbar()
