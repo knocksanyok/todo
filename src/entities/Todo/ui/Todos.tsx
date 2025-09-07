@@ -6,10 +6,9 @@ import Button from '@mui/material/Button'
 import type { TodoType } from '../model/todoType.ts'
 
 const Todos = () => {
-	//	const [todos, setTodos] = useState<TodoType[]>(mockTodos)
-
 	const [newTodoTitle, setNewTodoTitle] = useState('')
 	const [newTodoDescription, setNewTodoDescription] = useState('')
+
 	const todos = useTodosStore((state) => state.todos)
 	const addTodos = useTodosStore((state) => state.addTodo)
 	const setTodos = useTodosStore((state) => state.setTodos)

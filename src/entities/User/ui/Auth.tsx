@@ -3,19 +3,18 @@ import { Container, InputAdornment, Paper, Stack, TextField, ToggleButton, Toggl
 import IconButton from '@mui/material/IconButton'
 import Button from '@mui/material/Button'
 import LockIcon from '@mui/icons-material/Lock'
-import { type Dispatch, type SetStateAction, type SyntheticEvent, useState } from 'react'
+import { type SyntheticEvent, useState } from 'react'
 import { jwtDecode } from 'jwt-decode'
 import * as React from 'react'
 import type { UserType } from '../model/userType.ts'
 import { rootApi } from '../../../shared/api/rootApi.ts'
 import { useSnackbar } from 'notistack'
 import type { AxiosError } from 'axios'
+import { useUserStore } from '../model/store/useUserStore.ts'
 
-type AuthProps = {
-	setUser: Dispatch<SetStateAction<UserType | null>>
-}
+const Auth = () => {
+	const setUser = useUserStore((state) => state.setUser)
 
-const Auth = ({ setUser }: AuthProps) => {
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 	const [loading, setLoading] = useState(false)
