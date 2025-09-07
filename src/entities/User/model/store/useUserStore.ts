@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import type { UserType } from '../userType.ts'
 import { autoLogin } from '../../../../shared/util /autoLogin.ts'
+import { devtools } from 'zustand/middleware'
 
 type UserStoreState = {
 	user: UserType | null
@@ -10,12 +11,14 @@ type UserStoreState = {
 
 const userFromLS = autoLogin()
 
-export const useUserStore = create<UserStoreState>((set) => {
-	return {
-		user: userFromLS,
-		setUser: (user: UserType) => {
-			set({ user })
-		},
-		deleteUser: () => set({ user: null }),
-	}
-})
+export const useUserStore = create<UserStoreState>()(
+	devtools((set) => {
+		return {
+			user: userFromLS,
+			setUser: (user: UserType) => {
+				set({ user })
+			},
+			deleteUser: () => set({ user: null }),
+		}
+	})
+)
