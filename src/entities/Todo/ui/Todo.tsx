@@ -7,7 +7,7 @@ import IconButton from '@mui/material/IconButton'
 import ModeEditIcon from '@mui/icons-material/ModeEdit'
 import DoneIcon from '@mui/icons-material/Done'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
-import { useTodosStore } from '../model/store/use TodosStore.ts'
+import { useTodosStore } from '../model/store/useTodosStore.ts'
 
 type TodoProps = {
 	todo: TodoType
