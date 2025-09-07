@@ -13,7 +13,9 @@ import { useTodosStore } from '../../entities/Todo/model/store/useTodosStore.ts'
 import { useUserStore } from '../../entities/User/model/provider/userContext.tsx'
 
 const ButtonAppBar = () => {
-	const { user, setUser } = useUserStore()
+	const { user } = useUserStore()
+	const { deleteUser } = useUserStore()
+
 	const username = user?.username
 
 	const todos = useTodosStore((state) => state.todos)
@@ -23,8 +25,7 @@ const ButtonAppBar = () => {
 	if (!mode) return null
 
 	const handleLogout = () => {
-		localStorage.removeItem('accessToken')
-		setUser(user)
+		deleteUser()
 	}
 
 	return (
