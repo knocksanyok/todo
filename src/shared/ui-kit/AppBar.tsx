@@ -9,25 +9,22 @@ import { Avatar, Paper, Stack, Tooltip, useColorScheme } from '@mui/material'
 
 import WbSunnyIcon from '@mui/icons-material/WbSunny'
 import BedTimeIcon from '@mui/icons-material/BedTime'
-import type { UserType } from '../../entities/User/model/userType.ts'
-import type { Dispatch, SetStateAction } from 'react'
+import { useTodosStore } from '../../entities/Todo/model/store/useTodosStore.ts'
+import { useUserStore } from '../../entities/User/model/store/useUserStore.ts'
 
-type Props = {
-	access_token?: string
-	username?: string
-	setUser: Dispatch<SetStateAction<UserType | null>>
-}
+const ButtonAppBar = () => {
+	const todos = useTodosStore((state) => state.todos)
+	const undoneTodos = todos.filter((todo) => !todo.completed)
 
-const ButtonAppBar = (props: Props) => {
-	const { username } = props
-	const { setUser } = props
+	const username = useUserStore((state) => state.user)
+	const deleteUser = useUserStore((state) => state.deleteUser)
 
 	const { mode, setMode } = useColorScheme()
 	if (!mode) return null
 
 	const handleLogout = () => {
 		localStorage.removeItem('accessToken')
-		setUser(null)
+		deleteUser()
 	}
 
 	return (
@@ -40,7 +37,7 @@ const ButtonAppBar = (props: Props) => {
 					<Stack direction={'row'} spacing={2} style={{ flexGrow: 1 }}>
 						{username && (
 							<Typography variant="h6" component="div">
-								Todos
+								Todos{' ' + undoneTodos.length}
 							</Typography>
 						)}
 						<Typography variant="h6" component="div">
@@ -56,9 +53,9 @@ const ButtonAppBar = (props: Props) => {
 
 					{username ? (
 						<Stack direction={'row'} spacing={1}>
-							<Tooltip title={username}>
-								<Avatar src={''} alt={username}>
-									{username[0]}
+							<Tooltip title={username.username}>
+								<Avatar src={''} alt={username.username}>
+									{username.username[0]}
 								</Avatar>
 							</Tooltip>
 							<Button color="inherit" variant="outlined" onClick={handleLogout}>
