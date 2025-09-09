@@ -1,16 +1,18 @@
 import { Container, Input, Stack } from '@mui/material'
-import { useTodosStore } from '../model/store/useTodosStore.ts'
 import { Todo } from './Todo.tsx'
 import { type ChangeEvent, useState } from 'react'
 import Button from '@mui/material/Button'
 import type { TodoType } from '../model/todoType.ts'
 
+import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
+import { addTodo, selectTodos } from '../model/store/todosStore.ts'
+
 const Todos = () => {
 	const [newTodoTitle, setNewTodoTitle] = useState('')
 	const [newTodoDescription, setNewTodoDescription] = useState('')
 
-	const todos = useTodosStore((state) => state.todos)
-	const addTodos = useTodosStore((state) => state.addTodo)
+	const todos = useAppSelector(selectTodos)
+	const dispatch = useAppDispatch()
 
 	const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setNewTodoTitle(e.target.value)
@@ -30,7 +32,7 @@ const Todos = () => {
 			updatedAt: new Date().toISOString(),
 			order: todos.length + 1,
 		}
-		addTodos(newTodo)
+		dispatch(addTodo(newTodo))
 	}
 
 	return (

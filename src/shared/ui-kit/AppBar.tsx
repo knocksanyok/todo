@@ -9,13 +9,14 @@ import { Avatar, Paper, Stack, Tooltip, useColorScheme } from '@mui/material'
 
 import WbSunnyIcon from '@mui/icons-material/WbSunny'
 import BedTimeIcon from '@mui/icons-material/BedTime'
-import { useTodosStore } from '../../entities/Todo/model/store/useTodosStore.ts'
 import { removeUser, selectUser } from '../../entities/User/model/store/userStore.ts'
 import { useSelector } from 'react-redux'
-import { useAppDispatch } from '../../app/store.ts'
+import { useAppDispatch, useAppSelector } from '../../app/store.ts'
+import { selectTodos } from '../../entities/Todo/model/store/todosStore.ts'
 
 const ButtonAppBar = () => {
-	const todos = useTodosStore((state) => state.todos)
+	const todos = useAppSelector(selectTodos)
+
 	const undoneTodos = todos.filter((todo) => !todo.completed)
 
 	const username = useSelector(selectUser)
