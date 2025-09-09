@@ -7,7 +7,8 @@ import IconButton from '@mui/material/IconButton'
 import ModeEditIcon from '@mui/icons-material/ModeEdit'
 import DoneIcon from '@mui/icons-material/Done'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
-import { useTodosStore } from '../model/store/useTodosStore.ts'
+import { useAppDispatch } from '../../../app/store.ts'
+import { removeTodo, setTodo } from '../model/store/todosStore.ts'
 
 type TodoProps = {
 	todo: TodoType
@@ -20,11 +21,10 @@ export const Todo = ({ todo }: TodoProps) => {
 	const [editedTitle, setEditedTitle] = useState(todo.title)
 	const [editedDescription, setEditedDescription] = useState(todo.description)
 
-	const removeTodo = useTodosStore((state) => state.removeTodo)
-	const setTodo = useTodosStore((state) => state.setTodo)
+	const dispatch = useAppDispatch()
 
 	const handleCheckClick = () => {
-		setTodo({ ...todo, completed: !todo.completed })
+		dispatch(setTodo({ ...todo, completed: !todo.completed }))
 	}
 
 	const handleTitleChanger = () => {
@@ -34,7 +34,7 @@ export const Todo = ({ todo }: TodoProps) => {
 	const handleTitleChangerTextField = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
 		const newValue = e.currentTarget.value
 		setEditedTitle(newValue)
-		setTodo({ ...todo, title: newValue, updatedAt: Date() })
+		dispatch(setTodo({ ...todo, title: newValue, updatedAt: Date() }))
 	}
 
 	const handleDescriptionChanger = () => {
@@ -44,7 +44,7 @@ export const Todo = ({ todo }: TodoProps) => {
 	const handleTitleChangerDescriptionTextField = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
 		const newValue = e.currentTarget.value
 		setEditedDescription(newValue)
-		setTodo({ ...todo, description: newValue, updatedAt: Date() })
+		dispatch(setTodo({ ...todo, description: newValue, updatedAt: Date() }))
 	}
 
 	const DoneEditTitle = () => {
@@ -59,7 +59,7 @@ export const Todo = ({ todo }: TodoProps) => {
 
 	const handleRemoveTodo = () => {
 		const todoForDelete = todo._id
-		removeTodo(todoForDelete)
+		dispatch(removeTodo(todoForDelete))
 	}
 
 	const { enqueueSnackbar } = useSnackbar()
