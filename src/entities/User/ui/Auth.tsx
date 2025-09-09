@@ -10,14 +10,15 @@ import type { UserType } from '../model/userType.ts'
 import { rootApi } from '../../../shared/api/rootApi.ts'
 import { useSnackbar } from 'notistack'
 import type { AxiosError } from 'axios'
-import { useUserStore } from '../model/store/useUserStore.ts'
+import { selectIsLoading, setIsLoading, setUser } from '../model/store/userStore.ts'
+import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
 
 const Auth = () => {
-	const setUser = useUserStore((state) => state.setUser)
+	const dispatch = useAppDispatch()
+	const loading = useAppSelector(selectIsLoading)
 
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
-	const [loading, setLoading] = useState(false)
 	const [loginFormName, setloginFormName] = useState('login')
 	const { enqueueSnackbar } = useSnackbar()
 
@@ -30,28 +31,30 @@ const Auth = () => {
 		setPassword(e.currentTarget.value)
 
 	const handleLogin = async () => {
-		setLoading(true)
+		dispatch(setIsLoading(true))
 		try {
 			const loginData = await rootApi.post<UserType>('/auth/login', { username: username, password: password })
 
 			const accessToken = loginData.data.access_token
 			localStorage.setItem('accessToken', accessToken)
 			console.warn(jwtDecode(accessToken))
-
-			setUser(loginData.data)
-			setLoading(false)
+			console.log('Auth', loginData.data)
+			const setUserAction = setUser(loginData.data)
+			console.log(setUserAction)
+			dispatch(setUser(loginData.data))
+			dispatch(setIsLoading(false))
 			enqueueSnackbar('Welcome', { variant: 'success' })
 		} catch (error) {
 			const axiousError = error as AxiosError<{ message: string }>
 			enqueueSnackbar(axiousError.response?.data.message || 'Unknown error', { variant: 'error' })
-			setLoading(false)
+			dispatch(setIsLoading(false))
 		} finally {
-			setLoading(false)
+			dispatch(setIsLoading(false))
 		}
 	}
 
 	const handleRegister = async () => {
-		setLoading(true)
+		dispatch(setIsLoading(true))
 		try {
 			const registerData = await rootApi.post<UserType>('/auth/register', {
 				username: username,
@@ -65,15 +68,15 @@ const Auth = () => {
 				console.warn(jwtDecode(accessToken))
 
 				setUser(loginData.data)
-				setLoading(false)
+				dispatch(setIsLoading(false))
 				enqueueSnackbar('Registration successful', { variant: 'success' })
 			}
 		} catch (error) {
 			const axiousError = error as AxiosError<{ message: string }>
 			enqueueSnackbar(axiousError.response?.data.message || 'Unknown error', { variant: 'error' })
-			setLoading(false)
+			dispatch(setIsLoading(false))
 		} finally {
-			setLoading(false)
+			dispatch(setIsLoading(false))
 		}
 	}
 

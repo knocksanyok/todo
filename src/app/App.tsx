@@ -8,10 +8,11 @@ import './App.css'
 import AppBar from '../shared/ui-kit/AppBar.tsx'
 import Auth from '../entities/User/ui/Auth.tsx'
 import Todos from '../entities/Todo/ui/Todos.tsx'
-import { useUserStore } from '../entities/User/model/store/useUserStore.ts'
+import { useAppSelector } from './store.ts'
+import { selectUser } from '../entities/User/model/store/userStore.ts'
 
 function App() {
-	const user = useUserStore((state) => state.user)
+	const username = useAppSelector(selectUser)
 
 	return (
 		<>
@@ -19,7 +20,7 @@ function App() {
 
 			<div style={{ marginTop: '100px' }} />
 
-			{user ? <Todos /> : <Auth />}
+			{username ? <Todos /> : <Auth />}
 		</>
 	)
 }

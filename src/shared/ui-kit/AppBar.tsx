@@ -10,21 +10,24 @@ import { Avatar, Paper, Stack, Tooltip, useColorScheme } from '@mui/material'
 import WbSunnyIcon from '@mui/icons-material/WbSunny'
 import BedTimeIcon from '@mui/icons-material/BedTime'
 import { useTodosStore } from '../../entities/Todo/model/store/useTodosStore.ts'
-import { useUserStore } from '../../entities/User/model/store/useUserStore.ts'
+import { removeUser, selectUser } from '../../entities/User/model/store/userStore.ts'
+import { useSelector } from 'react-redux'
+import { useAppDispatch } from '../../app/store.ts'
 
 const ButtonAppBar = () => {
 	const todos = useTodosStore((state) => state.todos)
 	const undoneTodos = todos.filter((todo) => !todo.completed)
 
-	const username = useUserStore((state) => state.user)
-	const deleteUser = useUserStore((state) => state.deleteUser)
+	const username = useSelector(selectUser)
+
+	const dispatch = useAppDispatch()
 
 	const { mode, setMode } = useColorScheme()
 	if (!mode) return null
 
 	const handleLogout = () => {
 		localStorage.removeItem('accessToken')
-		deleteUser()
+		dispatch(removeUser())
 	}
 
 	return (
@@ -53,9 +56,9 @@ const ButtonAppBar = () => {
 
 					{username ? (
 						<Stack direction={'row'} spacing={1}>
-							<Tooltip title={username.username}>
-								<Avatar src={''} alt={username.username}>
-									{username.username[0]}
+							<Tooltip title={username?.username}>
+								<Avatar src={''} alt={username?.username}>
+									{username?.username[0]}
 								</Avatar>
 							</Tooltip>
 							<Button color="inherit" variant="outlined" onClick={handleLogout}>
