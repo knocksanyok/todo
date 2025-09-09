@@ -13,6 +13,7 @@ import { removeUser, selectUser } from '../../entities/User/model/store/userStor
 import { useSelector } from 'react-redux'
 import { useAppDispatch, useAppSelector } from '../../app/store.ts'
 import { selectTodos } from '../../entities/Todo/model/store/todosStore.ts'
+import { NavLink, useLocation, useNavigate } from 'react-router'
 
 const ButtonAppBar = () => {
 	const todos = useAppSelector(selectTodos)
@@ -23,7 +24,13 @@ const ButtonAppBar = () => {
 
 	const dispatch = useAppDispatch()
 
+	const navigate = useNavigate()
+	const location = useLocation()
+
+	const isAboutPage = location.pathname === '/about'
+
 	const { mode, setMode } = useColorScheme()
+
 	if (!mode) return null
 
 	const handleLogout = () => {
@@ -45,7 +52,7 @@ const ButtonAppBar = () => {
 							</Typography>
 						)}
 						<Typography variant="h6" component="div">
-							About
+							<NavLink to={isAboutPage ? '/' : '/about'}>{isAboutPage ? 'Home' : 'About'}</NavLink>
 						</Typography>
 					</Stack>
 
@@ -67,7 +74,14 @@ const ButtonAppBar = () => {
 							</Button>
 						</Stack>
 					) : (
-						<Button color="inherit">Login</Button>
+						<Button
+							color="inherit"
+							onClick={() => {
+								navigate('/')
+							}}
+						>
+							Login
+						</Button>
 					)}
 				</Toolbar>
 			</AppBar>
