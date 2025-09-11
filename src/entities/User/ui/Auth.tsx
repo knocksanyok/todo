@@ -10,11 +10,13 @@ import type { UserType } from '../model/userType.ts'
 import { rootApi } from '../../../shared/api/rootApi.ts'
 import { useSnackbar } from 'notistack'
 import type { AxiosError } from 'axios'
-import { selectIsLoading, setIsLoading, setUser } from '../model/store/userStore.ts'
+import { selectIsLoading, selectUser, setIsLoading, setUser } from '../model/store/userStore.ts'
 import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
-import { useNavigate } from 'react-router'
+import { Navigate, useNavigate } from 'react-router'
 
 const Auth = () => {
+	const user = useAppSelector(selectUser)!
+
 	const navigate = useNavigate()
 
 	const dispatch = useAppDispatch()
@@ -23,6 +25,7 @@ const Auth = () => {
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 	const [loginFormName, setloginFormName] = useState('login')
+	const [error, setError] = useState(false)
 	const { enqueueSnackbar } = useSnackbar()
 
 	const handleClickShowPassword = () => setShowPassword((show) => !show)
@@ -87,6 +90,7 @@ const Auth = () => {
 
 	const handleChange = (_event: React.MouseEvent<HTMLElement>, newAlignment: string) => {
 		setloginFormName(newAlignment)
+		navigate(`/auth/${newAlignment}`)
 	}
 
 	const [showPassword, setShowPassword] = React.useState(false)
@@ -98,6 +102,15 @@ const Auth = () => {
 	const handleMouseUpPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
 		event.preventDefault()
 	}
+
+	if (user) {
+		return <Navigate to={'/about'} />
+	}
+
+	if (error) {
+		throw new Error('Error')
+	}
+
 	return (
 		<Container maxWidth={'sm'}>
 			<Paper elevation={12} sx={{ padding: 3, paddingTop: '30px' }}>
@@ -115,6 +128,9 @@ const Auth = () => {
 					<ToggleButton value="login">Login</ToggleButton>
 					<ToggleButton value="register">Register</ToggleButton>
 				</ToggleButtonGroup>
+				<Button variant={'contained'} color={'error'} fullWidth onClick={() => setError(true)}>
+					Error
+				</Button>
 				{loginFormName === 'login' ? (
 					<Stack spacing={2}>
 						<TextField

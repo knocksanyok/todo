@@ -36,6 +36,10 @@ const ButtonAppBar = () => {
 		dispatch(removeUser())
 	}
 
+	const handleRedirectToProfile = () => {
+		navigate('/profile')
+	}
+
 	return (
 		<Box sx={{ flexGrow: 1 }}>
 			<AppBar position="fixed">
@@ -63,7 +67,12 @@ const ButtonAppBar = () => {
 					{username ? (
 						<Stack direction={'row'} spacing={1}>
 							<Tooltip title={username?.username}>
-								<Avatar src={''} alt={username?.username}>
+								<Avatar
+									src={''}
+									alt={username?.username}
+									onClick={handleRedirectToProfile}
+									style={{ cursor: 'pointer' }}
+								>
 									{username?.username[0]}
 								</Avatar>
 							</Tooltip>

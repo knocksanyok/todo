@@ -1,5 +1,5 @@
-import { useAppSelector } from '../../../app/store.ts'
-import { selectUser } from '../../User/model/store/userStore.ts'
+import { useAppSelector } from '../../app/store.ts'
+import { selectUser } from '../../entities/User/model/store/userStore.ts'
 import { Navigate } from 'react-router'
 import type { ReactNode } from 'react'
 

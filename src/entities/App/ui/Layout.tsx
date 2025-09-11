@@ -1,12 +1,15 @@
 import { Outlet } from 'react-router'
 import AppBar from '../../../shared/ui-kit/AppBar.tsx'
+import ErrorHandler from './ErrorHandler.tsx'
 
 const Layout = () => {
 	return (
 		<>
 			<AppBar />
 			<div style={{ marginTop: '100px' }}>
-				<Outlet />
+				<ErrorHandler>
+					<Outlet />
+				</ErrorHandler>
 			</div>
 		</>
 	)
