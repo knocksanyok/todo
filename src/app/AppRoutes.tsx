@@ -3,13 +3,23 @@ import App from './App.tsx'
 import About from '../entities/App/ui/About.tsx'
 import NotFound from '../entities/App/ui/NotFound.tsx'
 import Layout from '../entities/App/ui/Layout.tsx'
+import Auth from '../entities/User/ui/Auth.tsx'
+import ProtectedRoute from '../entities/App/ui/ProtectedRoute.tsx'
 
 const AppRoutes = () => {
 	return (
 		<div>
 			<Routes>
 				<Route element={<Layout />}>
-					<Route index element={<App />} />
+					<Route path="/auth" element={<Auth />} />
+					<Route
+						path="/"
+						element={
+							<ProtectedRoute>
+								<App />
+							</ProtectedRoute>
+						}
+					/>
 					<Route path="/about" element={<About />} />
 					<Route path="*" element={<NotFound />} />
 				</Route>
@@ -17,5 +27,4 @@ const AppRoutes = () => {
 		</div>
 	)
 }
-
 export default AppRoutes

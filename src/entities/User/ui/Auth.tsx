@@ -12,8 +12,11 @@ import { useSnackbar } from 'notistack'
 import type { AxiosError } from 'axios'
 import { selectIsLoading, setIsLoading, setUser } from '../model/store/userStore.ts'
 import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
+import { useNavigate } from 'react-router'
 
 const Auth = () => {
+	const navigate = useNavigate()
+
 	const dispatch = useAppDispatch()
 	const loading = useAppSelector(selectIsLoading)
 
@@ -44,6 +47,7 @@ const Auth = () => {
 			dispatch(setUser(loginData.data))
 			dispatch(setIsLoading(false))
 			enqueueSnackbar('Welcome', { variant: 'success' })
+			navigate('/')
 		} catch (error) {
 			const axiousError = error as AxiosError<{ message: string }>
 			enqueueSnackbar(axiousError.response?.data.message || 'Unknown error', { variant: 'error' })
@@ -67,9 +71,10 @@ const Auth = () => {
 				localStorage.setItem('accessToken', accessToken)
 				console.warn(jwtDecode(accessToken))
 
-				setUser(loginData.data)
+				dispatch(setUser(loginData.data))
 				dispatch(setIsLoading(false))
 				enqueueSnackbar('Registration successful', { variant: 'success' })
+				navigate('/')
 			}
 		} catch (error) {
 			const axiousError = error as AxiosError<{ message: string }>

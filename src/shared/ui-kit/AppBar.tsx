@@ -12,13 +12,11 @@ import BedTimeIcon from '@mui/icons-material/BedTime'
 import { removeUser, selectUser } from '../../entities/User/model/store/userStore.ts'
 import { useSelector } from 'react-redux'
 import { useAppDispatch, useAppSelector } from '../../app/store.ts'
-import { selectTodos } from '../../entities/Todo/model/store/todosStore.ts'
 import { NavLink, useLocation, useNavigate } from 'react-router'
+import { selectUnDoneTodosLength } from '../../entities/Todo/model/store/selectors/selectUnDoneTodos.tsx'
 
 const ButtonAppBar = () => {
-	const todos = useAppSelector(selectTodos)
-
-	const undoneTodos = todos.filter((todo) => !todo.completed)
+	const undoneTodos = useAppSelector(selectUnDoneTodosLength)
 
 	const username = useSelector(selectUser)
 
@@ -48,7 +46,7 @@ const ButtonAppBar = () => {
 					<Stack direction={'row'} spacing={2} style={{ flexGrow: 1 }}>
 						{username && (
 							<Typography variant="h6" component="div">
-								Todos{' ' + undoneTodos.length}
+								Todos{' ' + undoneTodos}
 							</Typography>
 						)}
 						<Typography variant="h6" component="div">
