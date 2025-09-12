@@ -17,8 +17,8 @@ const AppRoutes = () => {
 						<Route path="/profile" element={<Profile />} />
 					</Route>
 					<Route path="/auth/*" element={<Auth />} />
-					<Route path="*" element={<NotFound />} />
 					<Route path="/about" element={<About />} />
+					<Route path="*" element={<NotFound />} />
 				</Route>
 			</Routes>
 		</div>

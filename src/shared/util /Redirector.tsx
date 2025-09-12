@@ -8,8 +8,10 @@ const Redirector = () => {
 	const userFromLs = autoLogin()
 	const dispatch = useAppDispatch()
 
-	console.log(window.location.pathname)
+	// console.log(window.location.pathname)
 	// const searchParams = new URLSearchParams(window.location.search)
+
+	console.log(userFromLs)
 
 	if (!user && !userFromLs) {
 		return <Navigate to={'/auth/login'} />

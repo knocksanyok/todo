@@ -1,110 +1,39 @@
-import { AccountCircle, Visibility, VisibilityOff } from '@mui/icons-material'
-import { Container, InputAdornment, Paper, Stack, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material'
-import IconButton from '@mui/material/IconButton'
+import { Container, Paper, ToggleButton, ToggleButtonGroup } from '@mui/material'
+
 import Button from '@mui/material/Button'
-import LockIcon from '@mui/icons-material/Lock'
-import { type SyntheticEvent, useState } from 'react'
-import { jwtDecode } from 'jwt-decode'
+import { useState } from 'react'
 import * as React from 'react'
-import type { UserType } from '../model/userType.ts'
-import { rootApi } from '../../../shared/api/rootApi.ts'
-import { useSnackbar } from 'notistack'
-import type { AxiosError } from 'axios'
-import { selectIsLoading, selectUser, setIsLoading, setUser } from '../model/store/userStore.ts'
+import { selectIsLoading, selectUser, setUser } from '../model/store/userStore.ts'
 import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
-import { Navigate, useNavigate } from 'react-router'
+import { Navigate, Route, Routes, useNavigate } from 'react-router'
+import { autoLogin } from '../../../shared/util /autoLogin.ts'
+
+import Register from '../../App/ui/Register.tsx'
+import Login from '../../App/ui/Login.tsx'
 
 const Auth = () => {
+	const [loginFormName, setloginFormName] = useState('login')
 	const user = useAppSelector(selectUser)!
 
 	const navigate = useNavigate()
 
+	const userFromLs = autoLogin()
 	const dispatch = useAppDispatch()
 	const loading = useAppSelector(selectIsLoading)
 
-	const [username, setUsername] = useState('')
-	const [password, setPassword] = useState('')
-	const [loginFormName, setloginFormName] = useState('login')
+	if (!user && userFromLs) {
+		dispatch(setUser(userFromLs))
+	}
+
 	const [error, setError] = useState(false)
-	const { enqueueSnackbar } = useSnackbar()
-
-	const handleClickShowPassword = () => setShowPassword((show) => !show)
-
-	const handleUserNameChange = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) =>
-		setUsername(e.currentTarget.value)
-
-	const handlePasswordChange = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) =>
-		setPassword(e.currentTarget.value)
-
-	const handleLogin = async () => {
-		dispatch(setIsLoading(true))
-		try {
-			const loginData = await rootApi.post<UserType>('/auth/login', { username: username, password: password })
-
-			const accessToken = loginData.data.access_token
-			localStorage.setItem('accessToken', accessToken)
-			console.warn(jwtDecode(accessToken))
-			console.log('Auth', loginData.data)
-			const setUserAction = setUser(loginData.data)
-			console.log(setUserAction)
-			dispatch(setUser(loginData.data))
-			dispatch(setIsLoading(false))
-			enqueueSnackbar('Welcome', { variant: 'success' })
-			navigate('/')
-		} catch (error) {
-			const axiousError = error as AxiosError<{ message: string }>
-			enqueueSnackbar(axiousError.response?.data.message || 'Unknown error', { variant: 'error' })
-			dispatch(setIsLoading(false))
-		} finally {
-			dispatch(setIsLoading(false))
-		}
-	}
-
-	const handleRegister = async () => {
-		dispatch(setIsLoading(true))
-		try {
-			const registerData = await rootApi.post<UserType>('/auth/register', {
-				username: username,
-				password: password,
-			})
-			if (registerData.status === 201) {
-				const loginData = await rootApi.post<UserType>('/auth/login', { username: username, password: password })
-
-				const accessToken = loginData.data.access_token
-				localStorage.setItem('accessToken', accessToken)
-				console.warn(jwtDecode(accessToken))
-
-				dispatch(setUser(loginData.data))
-				dispatch(setIsLoading(false))
-				enqueueSnackbar('Registration successful', { variant: 'success' })
-				navigate('/')
-			}
-		} catch (error) {
-			const axiousError = error as AxiosError<{ message: string }>
-			enqueueSnackbar(axiousError.response?.data.message || 'Unknown error', { variant: 'error' })
-			dispatch(setIsLoading(false))
-		} finally {
-			dispatch(setIsLoading(false))
-		}
-	}
 
 	const handleChange = (_event: React.MouseEvent<HTMLElement>, newAlignment: string) => {
 		setloginFormName(newAlignment)
 		navigate(`/auth/${newAlignment}`)
 	}
 
-	const [showPassword, setShowPassword] = React.useState(false)
-
-	const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-		event.preventDefault()
-	}
-
-	const handleMouseUpPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-		event.preventDefault()
-	}
-
 	if (user) {
-		return <Navigate to={'/about'} />
+		return <Navigate to={'/'} />
 	}
 
 	if (error) {
@@ -131,127 +60,10 @@ const Auth = () => {
 				<Button variant={'contained'} color={'error'} fullWidth onClick={() => setError(true)}>
 					Error
 				</Button>
-				{loginFormName === 'login' ? (
-					<Stack spacing={2}>
-						<TextField
-							disabled={loading}
-							value={username}
-							onChange={handleUserNameChange}
-							size="medium"
-							label="UserName"
-							variant="filled"
-							slotProps={{
-								input: {
-									startAdornment: (
-										<InputAdornment position="start">
-											<AccountCircle />
-										</InputAdornment>
-									),
-								},
-							}}
-						/>
-						<TextField
-							disabled={loading}
-							value={password}
-							onChange={handlePasswordChange}
-							size="medium"
-							label="Password"
-							type={showPassword ? 'text' : 'password'}
-							variant="filled"
-							slotProps={{
-								input: {
-									startAdornment: (
-										<InputAdornment position="start">
-											<LockIcon />
-										</InputAdornment>
-									),
-									endAdornment: (
-										<InputAdornment position="end">
-											<IconButton
-												aria-label={showPassword ? 'hide the password' : 'display the password'}
-												onClick={handleClickShowPassword}
-												onMouseDown={handleMouseDownPassword}
-												onMouseUp={handleMouseUpPassword}
-												edge="end"
-											>
-												{showPassword ? <VisibilityOff /> : <Visibility />}
-											</IconButton>
-										</InputAdornment>
-									),
-								},
-							}}
-						/>
-						<Button
-							onClick={handleLogin}
-							variant={'contained'}
-							loading={loading}
-							loadingPosition={'start'}
-							sx={{ backgroundColor: loginFormName === 'login' ? '#1976d2' : '#dc004e' }}
-						>
-							{loading ? 'Loading...' : 'Login'}
-						</Button>
-					</Stack>
-				) : (
-					<Stack spacing={2}>
-						<TextField
-							disabled={loading}
-							value={username}
-							onChange={handleUserNameChange}
-							size="medium"
-							label="UserName"
-							variant="filled"
-							slotProps={{
-								input: {
-									startAdornment: (
-										<InputAdornment position="start">
-											<AccountCircle />
-										</InputAdornment>
-									),
-								},
-							}}
-						/>
-						<TextField
-							disabled={loading}
-							value={password}
-							onChange={handlePasswordChange}
-							size="medium"
-							label="Password"
-							type={showPassword ? 'password' : 'text'}
-							variant="filled"
-							slotProps={{
-								input: {
-									startAdornment: (
-										<InputAdornment position="start">
-											<LockIcon />
-										</InputAdornment>
-									),
-									endAdornment: (
-										<InputAdornment position="end">
-											<IconButton
-												aria-label={showPassword ? 'hide the password' : 'display the password'}
-												onClick={handleClickShowPassword}
-												onMouseDown={handleMouseDownPassword}
-												onMouseUp={handleMouseUpPassword}
-												edge="end"
-											>
-												{showPassword ? <VisibilityOff /> : <Visibility />}
-											</IconButton>
-										</InputAdornment>
-									),
-								},
-							}}
-						/>
-						<Button
-							onClick={handleRegister}
-							variant={'contained'}
-							loading={loading}
-							loadingPosition={'start'}
-							sx={{ backgroundColor: loginFormName === 'login' ? '#1976d2' : '#dc004e' }}
-						>
-							{loading ? 'Loading...' : 'Register'}
-						</Button>
-					</Stack>
-				)}
+				<Routes>
+					<Route path="/login" element={<Login />} />
+					<Route path="/register" element={<Register />} />
+				</Routes>
 			</Paper>
 		</Container>
 	)
