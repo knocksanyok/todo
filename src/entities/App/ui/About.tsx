@@ -7,7 +7,9 @@ const About = () => {
 		<div>
 			<h1>About Us</h1>
 			<span>Version 1.0.0</span>
-			<Button variant={'contained'} onClick={() => navigate(-1)} />
+			<Button variant={'contained'} onClick={() => navigate(-1)}>
+				Go Back
+			</Button>
 		</div>
 	)
 }

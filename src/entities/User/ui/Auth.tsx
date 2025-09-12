@@ -13,28 +13,29 @@ import Login from '../../App/ui/Login.tsx'
 
 const Auth = () => {
 	const [loginFormName, setloginFormName] = useState('login')
+	const [error, setError] = useState(false)
+
 	const user = useAppSelector(selectUser)!
 
 	const navigate = useNavigate()
-
 	const userFromLs = autoLogin()
 	const dispatch = useAppDispatch()
 	const loading = useAppSelector(selectIsLoading)
-
-	if (!user && userFromLs) {
-		dispatch(setUser(userFromLs))
-	}
-
-	const [error, setError] = useState(false)
 
 	const handleChange = (_event: React.MouseEvent<HTMLElement>, newAlignment: string) => {
 		setloginFormName(newAlignment)
 		navigate(`/auth/${newAlignment}`)
 	}
 
-	if (user) {
-		return <Navigate to={'/'} />
-	}
+	// if (!user && userFromLs) {
+
+	// 	dispatch(setUser(userFromLs))
+	// }
+
+	// if (user) {
+
+	// 	return <Navigate to={'/'} />
+	// }
 
 	if (error) {
 		throw new Error('Error')

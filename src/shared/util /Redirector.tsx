@@ -10,11 +10,14 @@ const Redirector = () => {
 
 	// console.log(window.location.pathname)
 	// const searchParams = new URLSearchParams(window.location.search)
+	// console.log(searchParams)
+
+	const previousPath = window.location.pathname
 
 	console.log(userFromLs)
 
 	if (!user && !userFromLs) {
-		return <Navigate to={'/auth/login'} />
+		return <Navigate to={`/auth/login?back=${previousPath}`} />
 	}
 
 	if (!user && userFromLs) {

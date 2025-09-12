@@ -18,6 +18,7 @@ import { selectIsLoading, setIsLoading, setUser } from '../../User/model/store/u
 
 const Login = () => {
 	const navigate = useNavigate()
+
 	const dispatch = useAppDispatch()
 	const loading = useAppSelector(selectIsLoading)
 
@@ -48,7 +49,8 @@ const Login = () => {
 			dispatch(setUser(loginData.data))
 			dispatch(setIsLoading(false))
 			enqueueSnackbar('Welcome', { variant: 'success' })
-			navigate('/')
+			const back = new URLSearchParams(window.location.search).get('back')
+			navigate(back || '/')
 		} catch (error) {
 			const axiousError = error as AxiosError<{ message: string }>
 			enqueueSnackbar(axiousError.response?.data.message || 'Unknown error', { variant: 'error' })

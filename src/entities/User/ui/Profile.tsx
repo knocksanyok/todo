@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography'
 const Profile = () => {
 	const user = useAppSelector(selectUser)!
 	const tokenUntilSec = jwtDecode(user.access_token).exp!
-	const tokenUntil = new Date(tokenUntilSec * 1000).toLocaleDateString()
+	const tokenUntil = new Date(tokenUntilSec * 1000).toLocaleString()
 
 	return (
 		<Card sx={{ padding: '10px' }}>
