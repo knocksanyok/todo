@@ -12,7 +12,7 @@ import { useSnackbar } from 'notistack'
 import type { AxiosError } from 'axios'
 
 import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 import type { UserType } from '../../User/model/userType.ts'
 import { selectIsLoading, setIsLoading, setUser } from '../../User/model/store/userStore.ts'
 
@@ -26,6 +26,7 @@ const Login = () => {
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 	const { enqueueSnackbar } = useSnackbar()
+	const previousLocation = useLocation().state
 
 	const handleClickShowPassword = () => setShowPassword((show) => !show)
 
@@ -49,8 +50,8 @@ const Login = () => {
 			dispatch(setUser(loginData.data))
 			dispatch(setIsLoading(false))
 			enqueueSnackbar('Welcome', { variant: 'success' })
-			const back = new URLSearchParams(window.location.search).get('back')
-			navigate(back || '/')
+			const backPath = previousLocation?.back || '/'
+			navigate(backPath)
 		} catch (error) {
 			const axiousError = error as AxiosError<{ message: string }>
 			enqueueSnackbar(axiousError.response?.data.message || 'Unknown error', { variant: 'error' })

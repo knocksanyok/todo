@@ -28,12 +28,10 @@ const Auth = () => {
 	}
 
 	// if (!user && userFromLs) {
-
 	// 	dispatch(setUser(userFromLs))
 	// }
-
+	//
 	// if (user) {
-
 	// 	return <Navigate to={'/'} />
 	// }
 
