@@ -4,7 +4,7 @@ import { type ChangeEvent, useEffect, useState } from 'react'
 import Button from '@mui/material/Button'
 
 import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
-import { addTodoToStore, selectTodos, setTodo } from '../model/store/todosStore.ts'
+import { addTodoToStore, selectTodos, setTodos } from '../model/store/todosStore.ts'
 import { addTodo, getTodos } from '../api/todoApi.ts'
 import { useSnackbar } from 'notistack'
 import { selectUser } from '../../User/model/store/userStore.ts'
@@ -54,11 +54,11 @@ const Todos = () => {
 
 		getTodos(user?.access_token)
 			.then((todos) => {
-				dispatch(setTodo(todos.data || []))
+				dispatch(setTodos(todos.data || []))
 			})
 			.catch(() => {
 				enqueueSnackbar('Error fetching todos', { variant: 'error' })
-				dispatch(setTodo([]))
+				dispatch(setTodos([]))
 			})
 			.finally(() => {
 				setIsLoading(false)
