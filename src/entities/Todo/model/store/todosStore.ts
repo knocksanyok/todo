@@ -1,13 +1,19 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { mockTodos } from '../mockTodos.ts'
+import type { TodoType } from '../todoType.ts'
+
+type TodosType = {
+	todos: TodoType[]
+}
+
+const initialState: TodosType = {
+	todos: [],
+}
 
 export const todosStore = createSlice({
 	name: 'todos',
-	initialState: {
-		todos: mockTodos,
-	},
+	initialState,
 	reducers: {
-		addTodo: (state, actionNewTodo) => {
+		addTodoToStore: (state, actionNewTodo) => {
 			state.todos = [actionNewTodo.payload, ...state.todos]
 		},
 		removeTodo: (state, actionToDoId) => {
@@ -22,5 +28,5 @@ export const todosStore = createSlice({
 	},
 })
 
-export const { addTodo, removeTodo, setTodo } = todosStore.actions
+export const { addTodoToStore, removeTodo, setTodo } = todosStore.actions
 export const { selectTodos } = todosStore.selectors
