@@ -1,10 +1,10 @@
 import { CircularProgress, Container, Input, Stack } from '@mui/material'
 import { Todo } from './Todo.tsx'
-import { type ChangeEvent, useEffect, useState } from 'react'
+import { type ChangeEvent, useCallback, useEffect, useState } from 'react'
 import Button from '@mui/material/Button'
 
 import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
-import { addTodoToStore, selectTodos, setTodos } from '../model/store/todosStore.ts'
+import { selectTodos, setTodos } from '../model/store/todosStore.ts'
 import { addTodo, getTodos } from '../api/todoApi.ts'
 import { useSnackbar } from 'notistack'
 import { selectUser } from '../../User/model/store/userStore.ts'
@@ -28,30 +28,7 @@ const Todos = () => {
 		setNewTodoDescription(e.target.value)
 	}
 
-	const [isLoading, setIsLoading] = useState(true)
-
-	const handleAddTodo = async () => {
-		try {
-			setIsLoading(true)
-			if (!user?.access_token) return
-
-			const newTodo: CreateTodoType = {
-				title: newTodoTitle,
-				description: newTodoDescription,
-			}
-			const addedTodoResponse = await addTodo(newTodo, user?.access_token)
-			dispatch(addTodoToStore(addedTodoResponse.data))
-		} catch (error) {
-			enqueueSnackbar('Error adding todo', { variant: 'error' })
-			console.error(error)
-		} finally {
-			setIsLoading(false)
-		}
-	}
-
-	useEffect(() => {
-		if (!user?.access_token) return
-
+	const handleGetTodos = useCallback(async () => {
 		getTodos(user?.access_token)
 			.then((todos) => {
 				dispatch(setTodos(todos.data || []))
@@ -64,6 +41,32 @@ const Todos = () => {
 				setIsLoading(false)
 			})
 	}, [dispatch, enqueueSnackbar, user?.access_token])
+
+	const [isLoading, setIsLoading] = useState(true)
+
+	const handleAddTodo = async () => {
+		try {
+			setIsLoading(true)
+			if (!user?.access_token) return
+
+			const newTodo: CreateTodoType = {
+				title: newTodoTitle,
+				description: newTodoDescription,
+			}
+			await addTodo(newTodo, user?.access_token)
+			await handleGetTodos()
+		} catch (error) {
+			enqueueSnackbar('Error adding todo', { variant: 'error' })
+			console.error(error)
+		} finally {
+			setIsLoading(false)
+		}
+	}
+
+	useEffect(() => {
+		if (!user?.access_token) return
+		handleGetTodos()
+	}, [handleGetTodos, user?.access_token])
 
 	if (isLoading) {
 		return <CircularProgress />
