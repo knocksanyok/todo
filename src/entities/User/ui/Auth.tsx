@@ -5,7 +5,7 @@ import { useState } from 'react'
 import * as React from 'react'
 import { selectIsLoading, selectUser, setUser } from '../model/store/userStore.ts'
 import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
-import { Navigate, Route, Routes, useNavigate } from 'react-router'
+import { Route, Routes, useNavigate } from 'react-router'
 import { autoLogin } from '../../../shared/util /autoLogin.ts'
 
 import Register from '../../App/ui/Register.tsx'
@@ -27,10 +27,11 @@ const Auth = () => {
 		navigate(`/auth/${newAlignment}`)
 	}
 
-	// if (!user && userFromLs) {
-	// 	dispatch(setUser(userFromLs))
-	// }
-	//
+	if (!user && userFromLs) {
+		dispatch(setUser(userFromLs))
+	}
+
+	// Если включаю, то логика редиректа /profile ломается и всегда идет переброс на '/', ПОДУМАТЬ
 	// if (user) {
 	// 	return <Navigate to={'/'} />
 	// }
