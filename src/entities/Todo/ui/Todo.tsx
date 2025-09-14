@@ -8,8 +8,8 @@ import ModeEditIcon from '@mui/icons-material/ModeEdit'
 import DoneIcon from '@mui/icons-material/Done'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { useAppDispatch } from '../../../app/store.ts'
-import { removeTodoFromStore, setTodo } from '../model/store/todosStore.ts'
-import { deleteTodo } from '../api/todoApi.ts'
+import { setTodo, setTodos } from '../model/store/todosStore.ts'
+import { deleteTodo, getTodos } from '../api/todoApi.ts'
 
 type TodoProps = {
 	todo: TodoType
@@ -62,7 +62,9 @@ export const Todo = ({ todo }: TodoProps) => {
 		try {
 			const todoForDelete = todo._id
 			await deleteTodo(todoForDelete)
-			dispatch(removeTodoFromStore(todoForDelete))
+			getTodos().then((todos) => {
+				dispatch(setTodos(todos.data || []))
+			})
 		} catch (error) {
 			enqueueSnackbar('Error deleting todo', { variant: 'error' })
 			console.error(error)
