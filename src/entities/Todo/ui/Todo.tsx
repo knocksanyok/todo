@@ -8,7 +8,8 @@ import ModeEditIcon from '@mui/icons-material/ModeEdit'
 import DoneIcon from '@mui/icons-material/Done'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { useAppDispatch } from '../../../app/store.ts'
-import { removeTodo, setTodo } from '../model/store/todosStore.ts'
+import { setTodo, setTodos } from '../model/store/todosStore.ts'
+import { deleteTodo, getTodos, updateTodo } from '../api/todoApi.ts'
 
 type TodoProps = {
 	todo: TodoType
@@ -23,7 +24,9 @@ export const Todo = ({ todo }: TodoProps) => {
 
 	const dispatch = useAppDispatch()
 
-	const handleCheckClick = () => {
+	const handleCheckClick = async () => {
+		const todoForUpdate = todo._id
+		await updateTodo(todoForUpdate, { completed: !todo.completed })
 		dispatch(setTodo({ ...todo, completed: !todo.completed }))
 	}
 
@@ -47,19 +50,31 @@ export const Todo = ({ todo }: TodoProps) => {
 		dispatch(setTodo({ ...todo, description: newValue, updatedAt: Date() }))
 	}
 
-	const DoneEditTitle = () => {
+	const DoneEditTitle = async () => {
+		const todoForUpdate = todo._id
+		await updateTodo(todoForUpdate, { title: todo.title })
 		setIsTitle(!isTitle)
 		enqueueSnackbar('Заголовок успешно обновлен!', { variant: 'success' })
 	}
 
-	const DoneEditDescription = () => {
+	const DoneEditDescription = async () => {
+		const todoForUpdate = todo._id
+		await updateTodo(todoForUpdate, { description: todo.description })
 		setIsDescription(!isDescription)
 		enqueueSnackbar('Описание успешно обновлено!', { variant: 'success' })
 	}
 
-	const handleRemoveTodo = () => {
-		const todoForDelete = todo._id
-		dispatch(removeTodo(todoForDelete))
+	const handleRemoveTodo = async () => {
+		try {
+			const todoForDelete = todo._id
+			await deleteTodo(todoForDelete)
+			getTodos().then((todos) => {
+				dispatch(setTodos(todos.data || []))
+			})
+		} catch (error) {
+			enqueueSnackbar('Error deleting todo', { variant: 'error' })
+			console.error(error)
+		}
 	}
 
 	const { enqueueSnackbar } = useSnackbar()

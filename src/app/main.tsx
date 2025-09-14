@@ -1,11 +1,13 @@
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import App from './App.tsx'
 import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { SnackbarProvider } from 'notistack'
 import { Provider } from 'react-redux'
 import { store } from './store.ts'
+import { BrowserRouter } from 'react-router'
+import AppRoutes from './AppRoutes.tsx'
+import ErrorHandler from '../entities/App/ui/ErrorHandler.tsx'
 
 const theme = createTheme({
 	colorSchemes: {
@@ -14,12 +16,16 @@ const theme = createTheme({
 })
 
 createRoot(document.getElementById('root')!).render(
-	<Provider store={store}>
-		<SnackbarProvider>
-			<ThemeProvider theme={theme}>
-				<CssBaseline />
-				<App />
-			</ThemeProvider>
-		</SnackbarProvider>
-	</Provider>
+	<BrowserRouter>
+		<ErrorHandler>
+			<Provider store={store}>
+				<SnackbarProvider>
+					<ThemeProvider theme={theme}>
+						<CssBaseline />
+						<AppRoutes />
+					</ThemeProvider>
+				</SnackbarProvider>
+			</Provider>
+		</ErrorHandler>
+	</BrowserRouter>
 )

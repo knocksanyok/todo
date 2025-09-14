@@ -12,23 +12,32 @@ import BedTimeIcon from '@mui/icons-material/BedTime'
 import { removeUser, selectUser } from '../../entities/User/model/store/userStore.ts'
 import { useSelector } from 'react-redux'
 import { useAppDispatch, useAppSelector } from '../../app/store.ts'
-import { selectTodos } from '../../entities/Todo/model/store/todosStore.ts'
+import { NavLink, useLocation, useNavigate } from 'react-router'
+import { selectUnDoneTodosLength } from '../../entities/Todo/model/store/selectors/selectUnDoneTodos.tsx'
 
 const ButtonAppBar = () => {
-	const todos = useAppSelector(selectTodos)
-
-	const undoneTodos = todos.filter((todo) => !todo.completed)
+	const undoneTodos = useAppSelector(selectUnDoneTodosLength)
 
 	const username = useSelector(selectUser)
 
 	const dispatch = useAppDispatch()
 
+	const navigate = useNavigate()
+	const location = useLocation()
+
+	const isAboutPage = location.pathname === '/about'
+
 	const { mode, setMode } = useColorScheme()
+
 	if (!mode) return null
 
 	const handleLogout = () => {
 		localStorage.removeItem('accessToken')
 		dispatch(removeUser())
+	}
+
+	const handleRedirectToProfile = () => {
+		navigate('/profile')
 	}
 
 	return (
@@ -41,11 +50,11 @@ const ButtonAppBar = () => {
 					<Stack direction={'row'} spacing={2} style={{ flexGrow: 1 }}>
 						{username && (
 							<Typography variant="h6" component="div">
-								Todos{' ' + undoneTodos.length}
+								Todos{' ' + undoneTodos}
 							</Typography>
 						)}
 						<Typography variant="h6" component="div">
-							About
+							<NavLink to={isAboutPage ? '/' : '/about'}>{isAboutPage ? 'Home' : 'About'}</NavLink>
 						</Typography>
 					</Stack>
 
@@ -58,7 +67,12 @@ const ButtonAppBar = () => {
 					{username ? (
 						<Stack direction={'row'} spacing={1}>
 							<Tooltip title={username?.username}>
-								<Avatar src={''} alt={username?.username}>
+								<Avatar
+									src={''}
+									alt={username?.username}
+									onClick={handleRedirectToProfile}
+									style={{ cursor: 'pointer' }}
+								>
 									{username?.username[0]}
 								</Avatar>
 							</Tooltip>
@@ -67,7 +81,14 @@ const ButtonAppBar = () => {
 							</Button>
 						</Stack>
 					) : (
-						<Button color="inherit">Login</Button>
+						<Button
+							color="inherit"
+							onClick={() => {
+								navigate('/')
+							}}
+						>
+							Login
+						</Button>
 					)}
 				</Toolbar>
 			</AppBar>
