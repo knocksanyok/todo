@@ -9,13 +9,17 @@ export const addTodo = async (todo: CreateTodoType) => {
 	return await rootApi.post<TodoType>('/todos', todo)
 }
 
-export const deleteTodo = async (id: string) => {
-	return await rootApi.delete(`/todos/${id}`)
+export const deleteTodo = async (todoId: string) => {
+	return await rootApi.delete<TodoType>(`/todos/${todoId}`)
 }
 
 export const updateTodo = async (
-	id: string,
+	todoId: string,
 	data: { title?: string; description?: string; completed?: boolean; order?: number }
 ) => {
-	return await rootApi.patch(`/todos/${id}`, data)
+	return await rootApi.patch<TodoType>(`/todos/${todoId}`, data)
+}
+
+export const getTodoById = async (todoId: string) => {
+	return await rootApi.get<TodoType>(`/todos/${todoId}`)
 }
