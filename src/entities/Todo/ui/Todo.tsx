@@ -8,7 +8,8 @@ import ModeEditIcon from '@mui/icons-material/ModeEdit'
 import DoneIcon from '@mui/icons-material/Done'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { useAppDispatch } from '../../../app/store.ts'
-import { removeTodo, setTodo } from '../model/store/todosStore.ts'
+import { removeTodoFromStore, setTodo } from '../model/store/todosStore.ts'
+import { deleteTodo } from '../api/todoApi.ts'
 
 type TodoProps = {
 	todo: TodoType
@@ -57,9 +58,15 @@ export const Todo = ({ todo }: TodoProps) => {
 		enqueueSnackbar('Описание успешно обновлено!', { variant: 'success' })
 	}
 
-	const handleRemoveTodo = () => {
-		const todoForDelete = todo._id
-		dispatch(removeTodo(todoForDelete))
+	const handleRemoveTodo = async () => {
+		try {
+			const todoForDelete = todo._id
+			await deleteTodo(todoForDelete)
+			dispatch(removeTodoFromStore(todoForDelete))
+		} catch (error) {
+			enqueueSnackbar('Error deleting todo', { variant: 'error' })
+			console.error(error)
+		}
 	}
 
 	const { enqueueSnackbar } = useSnackbar()

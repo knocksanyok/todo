@@ -16,7 +16,7 @@ export const todosStore = createSlice({
 		addTodoToStore: (state, actionNewTodo) => {
 			state.todos = [actionNewTodo.payload, ...state.todos]
 		},
-		removeTodo: (state, actionToDoId) => {
+		removeTodoFromStore: (state, actionToDoId) => {
 			state.todos = state.todos.filter((t) => t._id !== actionToDoId.payload)
 		},
 		setTodo: (state, actionUpdateTodo) => {
@@ -31,5 +31,5 @@ export const todosStore = createSlice({
 	},
 })
 
-export const { addTodoToStore, removeTodo, setTodo, setTodos } = todosStore.actions
+export const { addTodoToStore, removeTodoFromStore, setTodo, setTodos } = todosStore.actions
 export const { selectTodos } = todosStore.selectors
