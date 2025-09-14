@@ -29,7 +29,7 @@ const Todos = () => {
 	}
 
 	const handleGetTodos = useCallback(async () => {
-		getTodos(user?.access_token)
+		getTodos()
 			.then((todos) => {
 				dispatch(setTodos(todos.data || []))
 			})
@@ -40,7 +40,7 @@ const Todos = () => {
 			.finally(() => {
 				setIsLoading(false)
 			})
-	}, [dispatch, enqueueSnackbar, user?.access_token])
+	}, [dispatch, enqueueSnackbar])
 
 	const [isLoading, setIsLoading] = useState(true)
 
@@ -53,7 +53,7 @@ const Todos = () => {
 				title: newTodoTitle,
 				description: newTodoDescription,
 			}
-			await addTodo(newTodo, user?.access_token)
+			await addTodo(newTodo)
 			await handleGetTodos()
 		} catch (error) {
 			enqueueSnackbar('Error adding todo', { variant: 'error' })
@@ -64,9 +64,8 @@ const Todos = () => {
 	}
 
 	useEffect(() => {
-		if (!user?.access_token) return
 		handleGetTodos()
-	}, [handleGetTodos, user?.access_token])
+	}, [handleGetTodos])
 
 	if (isLoading) {
 		return <CircularProgress />
