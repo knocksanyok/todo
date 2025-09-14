@@ -34,10 +34,8 @@ export const Todo = ({ todo }: TodoProps) => {
 		setIsTitle(!isTitle)
 	}
 
-	const handleTitleChangerTextField = async (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-		const todoForUpdate = todo._id
+	const handleTitleChangerTextField = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
 		const newValue = e.currentTarget.value
-		await updateTodo(todoForUpdate, { title: newValue })
 		setEditedTitle(newValue)
 		dispatch(setTodo({ ...todo, title: newValue, updatedAt: Date() }))
 	}
@@ -46,20 +44,22 @@ export const Todo = ({ todo }: TodoProps) => {
 		setIsDescription(!isDescription)
 	}
 
-	const handleTitleChangerDescriptionTextField = async (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-		const todoForUpdate = todo._id
+	const handleTitleChangerDescriptionTextField = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
 		const newValue = e.currentTarget.value
-		await updateTodo(todoForUpdate, { description: newValue })
 		setEditedDescription(newValue)
 		dispatch(setTodo({ ...todo, description: newValue, updatedAt: Date() }))
 	}
 
-	const DoneEditTitle = () => {
+	const DoneEditTitle = async () => {
+		const todoForUpdate = todo._id
+		await updateTodo(todoForUpdate, { title: todo.title })
 		setIsTitle(!isTitle)
 		enqueueSnackbar('Заголовок успешно обновлен!', { variant: 'success' })
 	}
 
-	const DoneEditDescription = () => {
+	const DoneEditDescription = async () => {
+		const todoForUpdate = todo._id
+		await updateTodo(todoForUpdate, { description: todo.description })
 		setIsDescription(!isDescription)
 		enqueueSnackbar('Описание успешно обновлено!', { variant: 'success' })
 	}
