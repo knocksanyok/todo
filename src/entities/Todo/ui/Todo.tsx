@@ -9,7 +9,7 @@ import DoneIcon from '@mui/icons-material/Done'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { useAppDispatch } from '../../../app/store.ts'
 import { setTodo, setTodos } from '../model/store/todosStore.ts'
-import { deleteTodo, getTodos } from '../api/todoApi.ts'
+import { deleteTodo, getTodos, updateTodo } from '../api/todoApi.ts'
 
 type TodoProps = {
 	todo: TodoType
@@ -24,7 +24,9 @@ export const Todo = ({ todo }: TodoProps) => {
 
 	const dispatch = useAppDispatch()
 
-	const handleCheckClick = () => {
+	const handleCheckClick = async () => {
+		const todoForUpdate = todo._id
+		await updateTodo(todoForUpdate, { completed: !todo.completed })
 		dispatch(setTodo({ ...todo, completed: !todo.completed }))
 	}
 
@@ -32,8 +34,10 @@ export const Todo = ({ todo }: TodoProps) => {
 		setIsTitle(!isTitle)
 	}
 
-	const handleTitleChangerTextField = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+	const handleTitleChangerTextField = async (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+		const todoForUpdate = todo._id
 		const newValue = e.currentTarget.value
+		await updateTodo(todoForUpdate, { title: newValue })
 		setEditedTitle(newValue)
 		dispatch(setTodo({ ...todo, title: newValue, updatedAt: Date() }))
 	}
@@ -42,8 +46,10 @@ export const Todo = ({ todo }: TodoProps) => {
 		setIsDescription(!isDescription)
 	}
 
-	const handleTitleChangerDescriptionTextField = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+	const handleTitleChangerDescriptionTextField = async (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+		const todoForUpdate = todo._id
 		const newValue = e.currentTarget.value
+		await updateTodo(todoForUpdate, { description: newValue })
 		setEditedDescription(newValue)
 		dispatch(setTodo({ ...todo, description: newValue, updatedAt: Date() }))
 	}
