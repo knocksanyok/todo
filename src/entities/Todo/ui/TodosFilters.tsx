@@ -19,14 +19,23 @@ import {
 } from '@mui/material'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
+import { useDebounce } from 'use-debounce'
+import { useEffect, useState } from 'react'
 
 const TodosFilters = () => {
 	const filters = useAppSelector(selectFilters)
 	const todosLength = useAppSelector(selectTodos).length
 	const dispatch = useAppDispatch()
 
-	const handleChangeSearh = (e: React.ChangeEvent<HTMLInputElement>) => {
-		dispatch(setSearch(e.currentTarget.value))
+	const [query, setQuery] = useState('')
+	const [debouncedQuery] = useDebounce(query, 300)
+
+	useEffect(() => {
+		dispatch(setSearch(debouncedQuery))
+	}, [debouncedQuery, dispatch])
+
+	const handleChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setQuery(e.target.value)
 	}
 
 	const handleFilterChange = (filter: 'true' | 'false' | 'all') => {
@@ -52,7 +61,7 @@ const TodosFilters = () => {
 			<Accordion>
 				<AccordionSummary>Filters</AccordionSummary>
 				<AccordionDetails>
-					<Input onChange={handleChangeSearh} value={filters.search || ''} />
+					<Input onChange={handleChangeSearch} value={query} />
 					<ButtonGroup>
 						<Button
 							variant={filters.completed === 'true' ? 'contained' : 'outlined'}
