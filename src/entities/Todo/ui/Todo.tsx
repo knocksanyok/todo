@@ -7,8 +7,8 @@ import IconButton from '@mui/material/IconButton'
 import ModeEditIcon from '@mui/icons-material/ModeEdit'
 import DoneIcon from '@mui/icons-material/Done'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
-import { useAppDispatch } from '../../../app/store.ts'
-import { setTodo, setTodos } from '../model/store/todosStore.ts'
+import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
+import { selectFilters, setTodo, setTodos } from '../model/store/todosStore.ts'
 import { deleteTodo, getTodos, updateTodo } from '../api/todoApi.ts'
 import { NavLink } from 'react-router'
 
@@ -25,6 +25,7 @@ export const Todo = memo(
 		const [editedDescription, setEditedDescription] = useState(todo.description)
 
 		const dispatch = useAppDispatch()
+		const filters = useAppSelector(selectFilters)
 
 		const handleCheckClick = async () => {
 			const todoForUpdate = todo._id
@@ -70,7 +71,7 @@ export const Todo = memo(
 			try {
 				const todoForDelete = todo._id
 				await deleteTodo(todoForDelete)
-				getTodos().then((todos) => {
+				getTodos(filters).then((todos) => {
 					dispatch(setTodos(todos.data || []))
 				})
 			} catch (error) {
