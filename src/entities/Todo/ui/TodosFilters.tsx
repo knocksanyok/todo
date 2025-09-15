@@ -19,8 +19,8 @@ import {
 } from '@mui/material'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
-import { useDebounce } from 'use-debounce'
-import { useEffect, useState } from 'react'
+import { useThrottledCallback } from 'use-debounce'
+import { useState } from 'react'
 
 const TodosFilters = () => {
 	const filters = useAppSelector(selectFilters)
@@ -28,14 +28,16 @@ const TodosFilters = () => {
 	const dispatch = useAppDispatch()
 
 	const [query, setQuery] = useState('')
-	const [debouncedQuery] = useDebounce(query, 300)
 
-	useEffect(() => {
-		dispatch(setSearch(debouncedQuery))
-	}, [debouncedQuery, dispatch])
+	const handleSearchDispatch = () => {
+		dispatch(setSearch(query))
+	}
+
+	const throttledSearch = useThrottledCallback(handleSearchDispatch, 300)
 
 	const handleChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setQuery(e.target.value)
+		throttledSearch()
 	}
 
 	const handleFilterChange = (filter: 'true' | 'false' | 'all') => {
