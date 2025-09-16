@@ -6,6 +6,7 @@ import Layout from '../entities/App/ui/Layout.tsx'
 import Auth from '../entities/User/ui/Auth.tsx'
 import Profile from '../entities/User/ui/Profile.tsx'
 import Redirector from '../shared/util /Redirector.tsx'
+import SingleTodo from '../entities/Todo/ui/SingleTodo.tsx'
 
 const AppRoutes = () => {
 	return (
@@ -15,6 +16,7 @@ const AppRoutes = () => {
 					<Route element={<Redirector />}>
 						<Route path="/" element={<App />} />
 						<Route path="/profile" element={<Profile />} />
+						<Route path="/todo/:_id" element={<SingleTodo />} />
 					</Route>
 					<Route path="/auth/*" element={<Auth />} />
 					<Route path="/about" element={<About />} />

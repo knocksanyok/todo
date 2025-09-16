@@ -1,12 +1,25 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 import type { TodoType } from '../todoType.ts'
 
-type TodosType = {
+export type TodosType = {
 	todos: TodoType[]
+	todosAllCount: number
+	filters: {
+		completed: 'true' | 'false' | 'all'
+		page: number
+		limit: number
+		search?: string
+	}
 }
 
 const initialState: TodosType = {
 	todos: [],
+	todosAllCount: 0,
+	filters: {
+		limit: 5,
+		page: 1,
+		completed: 'all',
+	},
 }
 
 export const todosStore = createSlice({
@@ -25,11 +38,38 @@ export const todosStore = createSlice({
 		setTodos: (state, actionUpdateTodos) => {
 			state.todos = actionUpdateTodos.payload
 		},
+		setLimit: (state, action) => {
+			state.filters.limit = action.payload
+		},
+		setPage: (state, action) => {
+			state.filters.page = action.payload
+		},
+		setCompletedFilter: (state, action: PayloadAction<'all' | 'true' | 'false'>) => {
+			state.filters.completed = action.payload
+		},
+		setSearch: (state, action) => {
+			state.filters.search = action.payload
+		},
+		setTodosCount: (state, action: PayloadAction<number>) => {
+			state.todosAllCount = action.payload
+		},
 	},
 	selectors: {
 		selectTodos: (state) => state.todos,
+		selectFilters: (state) => state.filters,
+		selectTodosCount: (state) => state.todosAllCount,
 	},
 })
 
-export const { addTodoToStore, removeTodoFromStore, setTodo, setTodos } = todosStore.actions
-export const { selectTodos } = todosStore.selectors
+export const {
+	addTodoToStore,
+	removeTodoFromStore,
+	setTodo,
+	setTodos,
+	setLimit,
+	setPage,
+	setCompletedFilter,
+	setSearch,
+	setTodosCount,
+} = todosStore.actions
+export const { selectTodos, selectFilters, selectTodosCount } = todosStore.selectors

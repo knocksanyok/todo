@@ -4,7 +4,7 @@ import { type ChangeEvent, useCallback, useEffect, useState } from 'react'
 import Button from '@mui/material/Button'
 
 import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
-import { selectTodos, setTodos } from '../model/store/todosStore.ts'
+import { selectFilters, selectTodos, setTodos } from '../model/store/todosStore.ts'
 import { addTodo, getTodos } from '../api/todoApi.ts'
 import { useSnackbar } from 'notistack'
 import { selectUser } from '../../User/model/store/userStore.ts'
@@ -19,6 +19,7 @@ const Todos = () => {
 	const user = useAppSelector(selectUser)
 	const todos = useAppSelector(selectTodos)
 	const dispatch = useAppDispatch()
+	const filters = useAppSelector(selectFilters)
 
 	const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setNewTodoTitle(e.target.value)
@@ -29,7 +30,8 @@ const Todos = () => {
 	}
 
 	const handleGetTodos = useCallback(async () => {
-		getTodos()
+		setIsLoading(true)
+		getTodos(filters)
 			.then((todos) => {
 				dispatch(setTodos(todos.data || []))
 			})
@@ -40,7 +42,7 @@ const Todos = () => {
 			.finally(() => {
 				setIsLoading(false)
 			})
-	}, [dispatch, enqueueSnackbar])
+	}, [dispatch, enqueueSnackbar, filters])
 
 	const [isLoading, setIsLoading] = useState(true)
 

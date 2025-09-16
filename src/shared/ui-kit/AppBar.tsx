@@ -14,13 +14,28 @@ import { useSelector } from 'react-redux'
 import { useAppDispatch, useAppSelector } from '../../app/store.ts'
 import { NavLink, useLocation, useNavigate } from 'react-router'
 import { selectUnDoneTodosLength } from '../../entities/Todo/model/store/selectors/selectUnDoneTodos.tsx'
+import { getAllTodos } from '../../entities/Todo/api/todoApi.ts'
+import { selectTodosCount, setTodosCount } from '../../entities/Todo/model/store/todosStore.ts'
+import { useEffect } from 'react'
 
 const ButtonAppBar = () => {
+	const dispatch = useAppDispatch()
+
 	const undoneTodos = useAppSelector(selectUnDoneTodosLength)
+	const totalTodos = useAppSelector(selectTodosCount)
+
+	const allTodosFromState = async () => {
+		getAllTodos().then((data) => {
+			const dataTodosLength = data.data.length
+			dispatch(setTodosCount(dataTodosLength))
+		})
+	}
+
+	useEffect(() => {
+		allTodosFromState()
+	}, [allTodosFromState])
 
 	const username = useSelector(selectUser)
-
-	const dispatch = useAppDispatch()
 
 	const navigate = useNavigate()
 	const location = useLocation()
@@ -50,7 +65,7 @@ const ButtonAppBar = () => {
 					<Stack direction={'row'} spacing={2} style={{ flexGrow: 1 }}>
 						{username && (
 							<Typography variant="h6" component="div">
-								Todos{' ' + undoneTodos}
+								Undone Todos - {' ' + undoneTodos}, All -{' ' + totalTodos}
 							</Typography>
 						)}
 						<Typography variant="h6" component="div">
