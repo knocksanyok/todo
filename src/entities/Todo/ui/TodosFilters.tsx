@@ -27,6 +27,9 @@ const TodosFilters = () => {
 	const todosLength = useAppSelector(selectTodos).length
 	const dispatch = useAppDispatch()
 
+	console.log(todosLength)
+	console.log(filters.limit)
+
 	const [query, setQuery] = useState('')
 
 	const handleSearchDispatch = () => {
