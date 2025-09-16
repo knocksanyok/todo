@@ -3,6 +3,7 @@ import type { TodoType } from '../todoType.ts'
 
 export type TodosType = {
 	todos: TodoType[]
+	todosAllCount: number
 	filters: {
 		completed: 'true' | 'false' | 'all'
 		page: number
@@ -13,6 +14,7 @@ export type TodosType = {
 
 const initialState: TodosType = {
 	todos: [],
+	todosAllCount: 0,
 	filters: {
 		limit: 5,
 		page: 1,
@@ -48,10 +50,14 @@ export const todosStore = createSlice({
 		setSearch: (state, action) => {
 			state.filters.search = action.payload
 		},
+		setTodosCount: (state, action: PayloadAction<number>) => {
+			state.todosAllCount = action.payload
+		},
 	},
 	selectors: {
 		selectTodos: (state) => state.todos,
 		selectFilters: (state) => state.filters,
+		selectTodosCount: (state) => state.todosAllCount,
 	},
 })
 
@@ -64,5 +70,6 @@ export const {
 	setPage,
 	setCompletedFilter,
 	setSearch,
+	setTodosCount,
 } = todosStore.actions
-export const { selectTodos, selectFilters } = todosStore.selectors
+export const { selectTodos, selectFilters, selectTodosCount } = todosStore.selectors

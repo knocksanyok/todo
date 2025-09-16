@@ -2,6 +2,10 @@ import { rootApi } from '../../../shared/api/rootApi.ts'
 import type { CreateTodoType, TodoType } from '../model/todoType.ts'
 import type { TodosType } from '../model/store/todosStore.ts'
 
+export const getAllTodos = async () => {
+	return await rootApi.get<TodoType[]>('/todos')
+}
+
 export const getTodos = async (filters: TodosType['filters']) => {
 	let queryParams = `?page=${filters.page}&limit=${filters.limit}`
 
