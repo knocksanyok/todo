@@ -3,7 +3,7 @@ import { Todo } from './Todo.tsx'
 import { type ChangeEvent, useEffect, useState } from 'react'
 import Button from '@mui/material/Button'
 
-import { useAddTodoMutation, useGetTodosQuery } from '../api/todoApi.ts'
+import { useAddTodoQueryMutation, useGetTodosQuery } from '../api/todoApi.ts'
 import { useSnackbar } from 'notistack'
 import { useAppSelector } from '../../../app/store.ts'
 import { selectFilters } from '../model/store/todosStore.ts'
@@ -33,7 +33,7 @@ const Todos = () => {
 		skip: !user?.access_token,
 	})
 
-	const [addTodoToBackend, { isLoading: isAddingTodo, isError: isAddingError }] = useAddTodoMutation()
+	const [addTodoToBackend, { isLoading: isAddingTodo, isError: isAddingError }] = useAddTodoQueryMutation()
 
 	const isLoading = isAddingTodo || isGettingTodos
 	const isError = isGettingError || isAddingError

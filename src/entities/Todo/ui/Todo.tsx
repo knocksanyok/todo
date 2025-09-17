@@ -8,8 +8,8 @@ import ModeEditIcon from '@mui/icons-material/ModeEdit'
 import DoneIcon from '@mui/icons-material/Done'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
-import { selectFilters, setTodo, setTodos } from '../model/store/todosStore.ts'
-import { deleteTodo, getTodos, updateTodo, useDeleteTodoQueryMutation } from '../api/todoApi.ts'
+import { selectTodos, setTodo } from '../model/store/todosStore.ts'
+import { useDeleteTodoQueryMutation, useUpdateTodoQueryMutation } from '../api/todoApi.ts'
 import { NavLink } from 'react-router'
 
 type TodoProps = {
@@ -25,17 +25,16 @@ export const Todo = memo(
 		const [editedTitle, setEditedTitle] = useState(todo.title)
 		const [editedDescription, setEditedDescription] = useState(todo.description)
 
+		const todosFromState = useAppSelector(selectTodos)
+		console.log(todosFromState)
 		const dispatch = useAppDispatch()
-		const filters = useAppSelector(selectFilters)
-
-		const handleCheckClick = async () => {
-			const todoForUpdate = todo._id
-			await updateTodo(todoForUpdate, { completed: !todo.completed })
-			dispatch(setTodo({ ...todo, completed: !todo.completed }))
-		}
 
 		const handleTitleChanger = () => {
 			setIsTitle(!isTitle)
+		}
+
+		const handleDescriptionChanger = () => {
+			setIsDescription(!isDescription)
 		}
 
 		const handleTitleChangerTextField = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -44,28 +43,10 @@ export const Todo = memo(
 			dispatch(setTodo({ ...todo, title: newValue, updatedAt: Date() }))
 		}
 
-		const handleDescriptionChanger = () => {
-			setIsDescription(!isDescription)
-		}
-
 		const handleTitleChangerDescriptionTextField = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
 			const newValue = e.currentTarget.value
 			setEditedDescription(newValue)
 			dispatch(setTodo({ ...todo, description: newValue, updatedAt: Date() }))
-		}
-
-		const DoneEditTitle = async () => {
-			const todoForUpdate = todo._id
-			await updateTodo(todoForUpdate, { title: todo.title })
-			setIsTitle(!isTitle)
-			enqueueSnackbar('Заголовок успешно обновлен!', { variant: 'success' })
-		}
-
-		const DoneEditDescription = async () => {
-			const todoForUpdate = todo._id
-			await updateTodo(todoForUpdate, { description: todo.description })
-			setIsDescription(!isDescription)
-			enqueueSnackbar('Описание успешно обновлено!', { variant: 'success' })
 		}
 
 		//Новая логика
@@ -73,11 +54,30 @@ export const Todo = memo(
 		const [deleteTodoFromBackend, { isLoading: isDeletingTodo, isError: isErrorDeleteTodo }] =
 			useDeleteTodoQueryMutation()
 
-		const isLoading = isDeletingTodo
-		const isError = isErrorDeleteTodo
+		const [updateTodoToBackend, { isLoading: isUpdatingTodo, isError: isErrorUpdatingTodo }] =
+			useUpdateTodoQueryMutation()
+
+		const isLoading = isDeletingTodo || isUpdatingTodo
+		const isError = isErrorDeleteTodo || isErrorUpdatingTodo
 
 		const handleRemoveTodo = () => {
 			deleteTodoFromBackend(todo._id)
+		}
+
+		const handleCheckClick = () => {
+			updateTodoToBackend({ _id: todo._id, completed: !todo.completed })
+		}
+
+		const DoneEditTitle = () => {
+			updateTodoToBackend({ _id: todo._id, title: editedTitle })
+			setIsTitle(!isTitle)
+			enqueueSnackbar('Заголовок успешно обновлен!', { variant: 'success' })
+		}
+
+		const DoneEditDescription = () => {
+			updateTodoToBackend({ _id: todo._id, description: editedDescription })
+			enqueueSnackbar('Заголовок успешно обновлен!', { variant: 'success' })
+			setIsDescription(!isDescription)
 		}
 
 		useEffect(() => {

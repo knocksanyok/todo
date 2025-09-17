@@ -1,5 +1,5 @@
 import { rootApi } from '../../../shared/api/rootApi.ts'
-import type { CreateTodoType, TodoType } from '../model/todoType.ts'
+import type { CreateTodoType, TodoType, UpdateTodoType } from '../model/todoType.ts'
 import type { TodosType } from '../model/store/todosStore.ts'
 
 const getQueryParams = (filters: TodosType['filters']) => {
@@ -49,6 +49,8 @@ export const getTodoById = async (todoId: string) => {
 	return await rootApi.get<TodoType>(`/todos/${todoId}`)
 }
 
+//RTQ Логика
+
 import { rtkApi } from './rtkApi.ts'
 
 export const todoApiRTK = rtkApi.injectEndpoints({
@@ -60,11 +62,11 @@ export const todoApiRTK = rtkApi.injectEndpoints({
 			},
 			providesTags: ['Todo'],
 		}),
-		addTodo: builder.mutation<TodoType, CreateTodoType>({
-			query: (todo) => ({
+		addTodoQuery: builder.mutation<TodoType, CreateTodoType>({
+			query: (createTodo) => ({
 				url: `/todos/`,
 				method: `POST`,
-				body: todo,
+				body: createTodo,
 			}),
 			invalidatesTags: ['Todo'],
 		}),
@@ -75,7 +77,16 @@ export const todoApiRTK = rtkApi.injectEndpoints({
 			}),
 			invalidatesTags: ['Todo'],
 		}),
+		updateTodoQuery: builder.mutation<void, UpdateTodoType>({
+			query: (updateTodo) => ({
+				url: `todos/${updateTodo._id}`,
+				method: `PATCH`,
+				body: updateTodo,
+			}),
+			invalidatesTags: ['Todo'],
+		}),
 	}),
 })
 
-export const { useGetTodosQuery, useAddTodoMutation, useDeleteTodoQueryMutation } = todoApiRTK
+export const { useGetTodosQuery, useAddTodoQueryMutation, useDeleteTodoQueryMutation, useUpdateTodoQueryMutation } =
+	todoApiRTK

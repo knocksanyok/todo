@@ -9,3 +9,11 @@ export type TodoType = {
 }
 
 export type CreateTodoType = Pick<TodoType, 'title' | 'description'>
+
+export type UpdateTodoType = {
+	_id: string
+	title?: string
+	order?: number
+	completed?: boolean
+	description?: string
+}
