@@ -1,7 +1,7 @@
 import type { TodoType } from '../model/todoType.ts'
-import { memo, type SyntheticEvent, useState } from 'react'
+import { memo, type SyntheticEvent, useEffect, useState } from 'react'
 import { useSnackbar } from 'notistack'
-import { Card, CardActions, CardContent, Checkbox, TextField } from '@mui/material'
+import { Card, CardActions, CardContent, Checkbox, TextField, CircularProgress } from '@mui/material'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import ModeEditIcon from '@mui/icons-material/ModeEdit'
@@ -9,7 +9,7 @@ import DoneIcon from '@mui/icons-material/Done'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
 import { selectFilters, setTodo, setTodos } from '../model/store/todosStore.ts'
-import { deleteTodo, getTodos, updateTodo } from '../api/todoApi.ts'
+import { deleteTodo, getTodos, updateTodo, useDeleteTodoQueryMutation } from '../api/todoApi.ts'
 import { NavLink } from 'react-router'
 
 type TodoProps = {
@@ -20,6 +20,7 @@ export const Todo = memo(
 	({ todo }: TodoProps) => {
 		const [isTitle, setIsTitle] = useState(true)
 		const [isDescription, setIsDescription] = useState(true)
+		const { enqueueSnackbar } = useSnackbar()
 
 		const [editedTitle, setEditedTitle] = useState(todo.title)
 		const [editedDescription, setEditedDescription] = useState(todo.description)
@@ -67,20 +68,27 @@ export const Todo = memo(
 			enqueueSnackbar('Описание успешно обновлено!', { variant: 'success' })
 		}
 
-		const handleRemoveTodo = async () => {
-			try {
-				const todoForDelete = todo._id
-				await deleteTodo(todoForDelete)
-				getTodos(filters).then((todos) => {
-					dispatch(setTodos(todos.data || []))
-				})
-			} catch (error) {
-				enqueueSnackbar('Error deleting todo', { variant: 'error' })
-				console.error(error)
-			}
+		//Новая логика
+
+		const [deleteTodoFromBackend, { isLoading: isDeletingTodo, isError: isErrorDeleteTodo }] =
+			useDeleteTodoQueryMutation()
+
+		const isLoading = isDeletingTodo
+		const isError = isErrorDeleteTodo
+
+		const handleRemoveTodo = () => {
+			deleteTodoFromBackend(todo._id)
 		}
 
-		const { enqueueSnackbar } = useSnackbar()
+		useEffect(() => {
+			if (isError) {
+				enqueueSnackbar('Error fetching todos', { variant: 'error' })
+			}
+		}, [isError, enqueueSnackbar])
+
+		if (isLoading) {
+			return <CircularProgress />
+		}
 
 		return (
 			<Card variant="outlined" sx={{ maxWidth: 200 }}>

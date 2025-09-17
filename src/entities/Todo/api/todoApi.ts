@@ -68,7 +68,14 @@ export const todoApiRTK = rtkApi.injectEndpoints({
 			}),
 			invalidatesTags: ['Todo'],
 		}),
+		deleteTodoQuery: builder.mutation<void, string>({
+			query: (todoId) => ({
+				url: `/todos/${todoId}`,
+				method: `DELETE`,
+			}),
+			invalidatesTags: ['Todo'],
+		}),
 	}),
 })
 
-export const { useGetTodosQuery, useAddTodoMutation } = todoApiRTK
+export const { useGetTodosQuery, useAddTodoMutation, useDeleteTodoQueryMutation } = todoApiRTK
