@@ -1,25 +1,21 @@
 import { CircularProgress, Container, Input, Stack } from '@mui/material'
 import { Todo } from './Todo.tsx'
-import { type ChangeEvent, useCallback, useEffect, useState } from 'react'
+import { type ChangeEvent, useEffect, useState } from 'react'
 import Button from '@mui/material/Button'
 
-import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
-import { selectFilters, selectTodos, setTodos } from '../model/store/todosStore.ts'
-import { addTodo, getTodos } from '../api/todoApi.ts'
+import { useAddTodoMutation, useGetTodosQuery } from '../api/todoApi.ts'
 import { useSnackbar } from 'notistack'
+import { useAppSelector } from '../../../app/store.ts'
+import { selectFilters } from '../model/store/todosStore.ts'
 import { selectUser } from '../../User/model/store/userStore.ts'
-import type { CreateTodoType } from '../model/todoType.ts'
 
 const Todos = () => {
 	const { enqueueSnackbar } = useSnackbar()
+	const filters = useAppSelector(selectFilters)
+	const user = useAppSelector(selectUser)
 
 	const [newTodoTitle, setNewTodoTitle] = useState('')
 	const [newTodoDescription, setNewTodoDescription] = useState('')
-
-	const user = useAppSelector(selectUser)
-	const todos = useAppSelector(selectTodos)
-	const dispatch = useAppDispatch()
-	const filters = useAppSelector(selectFilters)
 
 	const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setNewTodoTitle(e.target.value)
@@ -29,45 +25,28 @@ const Todos = () => {
 		setNewTodoDescription(e.target.value)
 	}
 
-	const handleGetTodos = useCallback(async () => {
-		setIsLoading(true)
-		getTodos(filters)
-			.then((todos) => {
-				dispatch(setTodos(todos.data || []))
-			})
-			.catch(() => {
-				enqueueSnackbar('Error fetching todos', { variant: 'error' })
-				dispatch(setTodos([]))
-			})
-			.finally(() => {
-				setIsLoading(false)
-			})
-	}, [dispatch, enqueueSnackbar, filters])
+	const {
+		data,
+		isLoading: isGettingTodos,
+		isError: isGettingError,
+	} = useGetTodosQuery(filters, {
+		skip: !user?.access_token,
+	})
 
-	const [isLoading, setIsLoading] = useState(true)
+	const [addTodoToBackend, { isLoading: isAddingTodo, isError: isAddingError }] = useAddTodoMutation()
 
-	const handleAddTodo = async () => {
-		try {
-			setIsLoading(true)
-			if (!user?.access_token) return
+	const isLoading = isAddingTodo || isGettingTodos
+	const isError = isGettingError || isAddingError
 
-			const newTodo: CreateTodoType = {
-				title: newTodoTitle,
-				description: newTodoDescription,
-			}
-			await addTodo(newTodo)
-			await handleGetTodos()
-		} catch (error) {
-			enqueueSnackbar('Error adding todo', { variant: 'error' })
-			console.error(error)
-		} finally {
-			setIsLoading(false)
-		}
+	const handleAddTodo = () => {
+		addTodoToBackend({ title: newTodoTitle, description: newTodoDescription })
 	}
 
 	useEffect(() => {
-		handleGetTodos()
-	}, [handleGetTodos])
+		if (isError) {
+			enqueueSnackbar('Error fetching todos', { variant: 'error' })
+		}
+	}, [isError, enqueueSnackbar])
 
 	if (isLoading) {
 		return <CircularProgress />
@@ -82,7 +61,7 @@ const Todos = () => {
 			</Button>
 
 			<Stack flexWrap={'wrap'} spacing={2} direction={'row'}>
-				{todos.map((todo) => {
+				{data?.map((todo) => {
 					return <Todo todo={todo} />
 				})}
 			</Stack>
