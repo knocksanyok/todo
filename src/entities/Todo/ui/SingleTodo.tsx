@@ -1,8 +1,8 @@
 import { type SyntheticEvent, useEffect, useState } from 'react'
 import { NavLink, useParams } from 'react-router'
-import { getTodoById, updateTodo } from '../api/todoApi.ts'
+import { useGetTodoByIdQuery, useUpdateTodoQueryMutation } from '../api/todoApi.ts'
 import type { TodoType } from '../model/todoType.ts'
-import { Card, CardContent, Checkbox, Stack, TextField } from '@mui/material'
+import { Card, CardContent, Checkbox, Stack, TextField, CircularProgress, Button } from '@mui/material'
 import type { To } from 'react-router-dom'
 import Typography from '@mui/material/Typography'
 import { formatDistanceToNow } from 'date-fns'
@@ -11,6 +11,7 @@ import IconButton from '@mui/material/IconButton'
 import DoneIcon from '@mui/icons-material/Done'
 import { setTodo } from '../model/store/todosStore.ts'
 import { useAppDispatch } from '../../../app/store.ts'
+import { enqueueSnackbar } from 'notistack'
 
 const SingleTodo = () => {
 	const [todo, setTodoHere] = useState<TodoType>()
@@ -23,21 +24,20 @@ const SingleTodo = () => {
 	const [editedTitle, setEditedTitle] = useState(todo?.title)
 	const [editedDescription, setEditedDescription] = useState(todo?.description)
 
+	const { data, isError: isErrorGettingTodo, refetch } = useGetTodoByIdQuery(params._id!, { skip: !params._id })
+
+	const [updateTodoToBackend, { isError: isErrorUpdatingTodo }] = useUpdateTodoQueryMutation()
+
+	const isError = isErrorGettingTodo || isErrorUpdatingTodo
+
 	useEffect(() => {
-		if (!params._id) return
+		if (isError) {
+			enqueueSnackbar('Error fetching todo', { variant: 'error' })
+		}
+		setTodoHere(data)
+	}, [data, isError])
 
-		getTodoById(params._id).then((res) => {
-			setTodoHere(res.data)
-		})
-	}, [params._id])
-
-	if (!todo) return <h1>Loading</h1>
-
-	const handleCheckClick = async () => {
-		await updateTodo(todo._id, { completed: !todo.completed })
-		setTodoHere({ ...todo, completed: !todo.completed })
-		dispatch(setTodo({ ...todo, completed: !todo.completed }))
-	}
+	if (!todo) return <CircularProgress />
 
 	const handleTitleChangerTextField = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
 		const newValue = e.currentTarget.value
@@ -53,9 +53,17 @@ const SingleTodo = () => {
 		dispatch(setTodo({ ...todo, description: newValue }))
 	}
 
-	const handleEditMode = async () => {
-		await updateTodo(todo._id, { title: editedTitle, description: editedDescription })
+	const handleEditMode = () => {
+		updateTodoToBackend({ _id: todo._id, title: editedTitle, description: editedDescription })
 		setEdit(!isEdit)
+	}
+
+	const handleCheckClick = async () => {
+		updateTodoToBackend({ _id: todo._id, completed: !todo.completed })
+	}
+
+	const handleRefresh = () => {
+		refetch()
 	}
 
 	return (
@@ -93,6 +101,9 @@ const SingleTodo = () => {
 					</CardContent>
 				</Card>
 			</Stack>
+			<Button color="inherit" variant="outlined" onClick={handleRefresh}>
+				Refresh
+			</Button>
 		</div>
 	)
 }

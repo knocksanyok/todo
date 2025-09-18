@@ -1,15 +1,15 @@
 import type { TodoType } from '../model/todoType.ts'
-import { memo, type SyntheticEvent, useState } from 'react'
+import { memo, type SyntheticEvent, useEffect, useState } from 'react'
 import { useSnackbar } from 'notistack'
-import { Card, CardActions, CardContent, Checkbox, TextField } from '@mui/material'
+import { Card, CardActions, CardContent, Checkbox, TextField, CircularProgress } from '@mui/material'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import ModeEditIcon from '@mui/icons-material/ModeEdit'
 import DoneIcon from '@mui/icons-material/Done'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
-import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
-import { selectFilters, setTodo, setTodos } from '../model/store/todosStore.ts'
-import { deleteTodo, getTodos, updateTodo } from '../api/todoApi.ts'
+import { useAppDispatch } from '../../../app/store.ts'
+import { setTodo } from '../model/store/todosStore.ts'
+import { useDeleteTodoQueryMutation, useUpdateTodoQueryMutation } from '../api/todoApi.ts'
 import { NavLink } from 'react-router'
 
 type TodoProps = {
@@ -20,21 +20,19 @@ export const Todo = memo(
 	({ todo }: TodoProps) => {
 		const [isTitle, setIsTitle] = useState(true)
 		const [isDescription, setIsDescription] = useState(true)
+		const { enqueueSnackbar } = useSnackbar()
 
 		const [editedTitle, setEditedTitle] = useState(todo.title)
 		const [editedDescription, setEditedDescription] = useState(todo.description)
 
 		const dispatch = useAppDispatch()
-		const filters = useAppSelector(selectFilters)
-
-		const handleCheckClick = async () => {
-			const todoForUpdate = todo._id
-			await updateTodo(todoForUpdate, { completed: !todo.completed })
-			dispatch(setTodo({ ...todo, completed: !todo.completed }))
-		}
 
 		const handleTitleChanger = () => {
 			setIsTitle(!isTitle)
+		}
+
+		const handleDescriptionChanger = () => {
+			setIsDescription(!isDescription)
 		}
 
 		const handleTitleChangerTextField = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -43,44 +41,50 @@ export const Todo = memo(
 			dispatch(setTodo({ ...todo, title: newValue, updatedAt: Date() }))
 		}
 
-		const handleDescriptionChanger = () => {
-			setIsDescription(!isDescription)
-		}
-
 		const handleTitleChangerDescriptionTextField = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
 			const newValue = e.currentTarget.value
 			setEditedDescription(newValue)
 			dispatch(setTodo({ ...todo, description: newValue, updatedAt: Date() }))
 		}
 
-		const DoneEditTitle = async () => {
-			const todoForUpdate = todo._id
-			await updateTodo(todoForUpdate, { title: todo.title })
+		const [deleteTodoFromBackend, { isLoading: isDeletingTodo, isError: isErrorDeleteTodo }] =
+			useDeleteTodoQueryMutation()
+
+		const [updateTodoToBackend, { isLoading: isUpdatingTodo, isError: isErrorUpdatingTodo }] =
+			useUpdateTodoQueryMutation()
+
+		const isLoading = isDeletingTodo || isUpdatingTodo
+		const isError = isErrorDeleteTodo || isErrorUpdatingTodo
+
+		const handleRemoveTodo = () => {
+			deleteTodoFromBackend(todo._id)
+		}
+
+		const handleCheckClick = () => {
+			updateTodoToBackend({ _id: todo._id, completed: !todo.completed })
+		}
+
+		const DoneEditTitle = () => {
+			updateTodoToBackend({ _id: todo._id, title: editedTitle })
 			setIsTitle(!isTitle)
 			enqueueSnackbar('Заголовок успешно обновлен!', { variant: 'success' })
 		}
 
-		const DoneEditDescription = async () => {
-			const todoForUpdate = todo._id
-			await updateTodo(todoForUpdate, { description: todo.description })
+		const DoneEditDescription = () => {
+			updateTodoToBackend({ _id: todo._id, description: editedDescription })
+			enqueueSnackbar('Заголовок успешно обновлен!', { variant: 'success' })
 			setIsDescription(!isDescription)
-			enqueueSnackbar('Описание успешно обновлено!', { variant: 'success' })
 		}
 
-		const handleRemoveTodo = async () => {
-			try {
-				const todoForDelete = todo._id
-				await deleteTodo(todoForDelete)
-				getTodos(filters).then((todos) => {
-					dispatch(setTodos(todos.data || []))
-				})
-			} catch (error) {
-				enqueueSnackbar('Error deleting todo', { variant: 'error' })
-				console.error(error)
+		useEffect(() => {
+			if (isError) {
+				enqueueSnackbar('Error fetching todos', { variant: 'error' })
 			}
-		}
+		}, [isError, enqueueSnackbar])
 
-		const { enqueueSnackbar } = useSnackbar()
+		if (isLoading) {
+			return <CircularProgress />
+		}
 
 		return (
 			<Card variant="outlined" sx={{ maxWidth: 200 }}>
