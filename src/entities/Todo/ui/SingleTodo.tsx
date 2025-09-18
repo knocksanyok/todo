@@ -1,6 +1,6 @@
 import { type SyntheticEvent, useEffect, useState } from 'react'
 import { NavLink, useParams } from 'react-router'
-import { useGetTodoByIdQueryMutation, useUpdateTodoQueryMutation } from '../api/todoApi.ts'
+import { useGetTodoByIdQuery, useUpdateTodoQueryMutation } from '../api/todoApi.ts'
 import type { TodoType } from '../model/todoType.ts'
 import { Card, CardContent, Checkbox, Stack, TextField, CircularProgress } from '@mui/material'
 import type { To } from 'react-router-dom'
@@ -24,25 +24,18 @@ const SingleTodo = () => {
 	const [editedTitle, setEditedTitle] = useState(todo?.title)
 	const [editedDescription, setEditedDescription] = useState(todo?.description)
 
-	const [getTodoByIdFromBackend, { isError: isErrorGettingTodo }] = useGetTodoByIdQueryMutation()
+	const { data, isError: isErrorGettingTodo } = useGetTodoByIdQuery(params._id!, { skip: !params._id })
 
 	const [updateTodoToBackend, { isError: isErrorUpdatingTodo }] = useUpdateTodoQueryMutation()
 
 	const isError = isErrorGettingTodo || isErrorUpdatingTodo
 
 	useEffect(() => {
-		if (!params._id) return
-
-		getTodoByIdFromBackend(params._id).then((res) => {
-			setTodoHere(res.data)
-		})
-	}, [getTodoByIdFromBackend, params._id])
-
-	useEffect(() => {
 		if (isError) {
 			enqueueSnackbar('Error fetching todo', { variant: 'error' })
 		}
-	}, [isError])
+		setTodoHere(data)
+	}, [data, isError])
 
 	if (!todo) return <CircularProgress />
 
