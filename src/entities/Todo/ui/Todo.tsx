@@ -7,8 +7,8 @@ import IconButton from '@mui/material/IconButton'
 import ModeEditIcon from '@mui/icons-material/ModeEdit'
 import DoneIcon from '@mui/icons-material/Done'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
-import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
-import { selectTodos, setTodo } from '../model/store/todosStore.ts'
+import { useAppDispatch } from '../../../app/store.ts'
+import { setTodo } from '../model/store/todosStore.ts'
 import { useDeleteTodoQueryMutation, useUpdateTodoQueryMutation } from '../api/todoApi.ts'
 import { NavLink } from 'react-router'
 
@@ -25,8 +25,6 @@ export const Todo = memo(
 		const [editedTitle, setEditedTitle] = useState(todo.title)
 		const [editedDescription, setEditedDescription] = useState(todo.description)
 
-		const todosFromState = useAppSelector(selectTodos)
-		console.log(todosFromState)
 		const dispatch = useAppDispatch()
 
 		const handleTitleChanger = () => {
@@ -48,8 +46,6 @@ export const Todo = memo(
 			setEditedDescription(newValue)
 			dispatch(setTodo({ ...todo, description: newValue, updatedAt: Date() }))
 		}
-
-		//Новая логика
 
 		const [deleteTodoFromBackend, { isLoading: isDeletingTodo, isError: isErrorDeleteTodo }] =
 			useDeleteTodoQueryMutation()

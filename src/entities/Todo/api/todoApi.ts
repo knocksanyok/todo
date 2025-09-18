@@ -85,8 +85,20 @@ export const todoApiRTK = rtkApi.injectEndpoints({
 			}),
 			invalidatesTags: ['Todo'],
 		}),
+		getTodoByIdQuery: builder.mutation<TodoType, string>({
+			query: (todoId) => ({
+				url: `/todos/${todoId}`,
+				method: `GET`,
+			}),
+			invalidatesTags: ['Todo'],
+		}),
 	}),
 })
 
-export const { useGetTodosQuery, useAddTodoQueryMutation, useDeleteTodoQueryMutation, useUpdateTodoQueryMutation } =
-	todoApiRTK
+export const {
+	useGetTodosQuery,
+	useAddTodoQueryMutation,
+	useDeleteTodoQueryMutation,
+	useUpdateTodoQueryMutation,
+	useGetTodoByIdQueryMutation,
+} = todoApiRTK
