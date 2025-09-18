@@ -11,29 +11,16 @@ import WbSunnyIcon from '@mui/icons-material/WbSunny'
 import BedTimeIcon from '@mui/icons-material/BedTime'
 import { removeUser, selectUser } from '../../entities/User/model/store/userStore.ts'
 import { useSelector } from 'react-redux'
-import { useAppDispatch, useAppSelector } from '../../app/store.ts'
+import { useAppDispatch } from '../../app/store.ts'
 import { NavLink, useLocation, useNavigate } from 'react-router'
-import { selectUnDoneTodosLength } from '../../entities/Todo/model/store/selectors/selectUnDoneTodos.tsx'
-import { getAllTodos } from '../../entities/Todo/api/todoApi.ts'
-import { selectTodosCount, setTodosCount } from '../../entities/Todo/model/store/todosStore.ts'
-import { useEffect } from 'react'
+import { useGetAllTodosQuery } from '../../entities/Todo/api/todoApi.ts'
 
 const ButtonAppBar = () => {
 	const dispatch = useAppDispatch()
 
-	const undoneTodos = useAppSelector(selectUnDoneTodosLength)
-	const totalTodos = useAppSelector(selectTodosCount)
-
-	const allTodosFromState = async () => {
-		getAllTodos().then((data) => {
-			const dataTodosLength = data.data.length
-			dispatch(setTodosCount(dataTodosLength))
-		})
-	}
-
-	useEffect(() => {
-		allTodosFromState()
-	}, [allTodosFromState])
+	const { data } = useGetAllTodosQuery()
+	const totalTodos = data?.length
+	const unDoneTodos = data?.filter((todo) => !todo.completed).length
 
 	const username = useSelector(selectUser)
 
@@ -65,7 +52,7 @@ const ButtonAppBar = () => {
 					<Stack direction={'row'} spacing={2} style={{ flexGrow: 1 }}>
 						{username && (
 							<Typography variant="h6" component="div">
-								Undone Todos - {' ' + undoneTodos}, All -{' ' + totalTodos}
+								Undone Todos - {' ' + unDoneTodos}, All -{' ' + totalTodos}
 							</Typography>
 						)}
 						<Typography variant="h6" component="div">
