@@ -2,18 +2,6 @@ import { rootApi } from '../../../shared/api/rootApi.ts'
 import type { CreateTodoType, TodoType, UpdateTodoType } from '../model/todoType.ts'
 import type { TodosType } from '../model/store/todosStore.ts'
 
-const getQueryParams = (filters: TodosType['filters']) => {
-	let queryParams = `?page=${filters.page}&limit=${filters.limit}`
-
-	if (filters.completed !== 'all') {
-		queryParams += `&completed=${filters.completed}`
-	}
-	if (filters.search) {
-		queryParams += `&search=${filters.search}`
-	}
-	return queryParams
-}
-
 export const getAllTodos = async () => {
 	return await rootApi.get<TodoType[]>('/todos')
 }
@@ -52,6 +40,18 @@ export const getTodoById = async (todoId: string) => {
 //RTQ Логика
 
 import { rtkApi } from './rtkApi.ts'
+
+const getQueryParams = (filters: TodosType['filters']) => {
+	let queryParams = `?page=${filters.page}&limit=${filters.limit}`
+
+	if (filters.completed !== 'all') {
+		queryParams += `&completed=${filters.completed}`
+	}
+	if (filters.search) {
+		queryParams += `&search=${filters.search}`
+	}
+	return queryParams
+}
 
 export const todoApiRTK = rtkApi.injectEndpoints({
 	endpoints: (builder) => ({

@@ -2,7 +2,7 @@ import { type SyntheticEvent, useEffect, useState } from 'react'
 import { NavLink, useParams } from 'react-router'
 import { useGetTodoByIdQuery, useUpdateTodoQueryMutation } from '../api/todoApi.ts'
 import type { TodoType } from '../model/todoType.ts'
-import { Card, CardContent, Checkbox, Stack, TextField, CircularProgress } from '@mui/material'
+import { Card, CardContent, Checkbox, Stack, TextField, CircularProgress, Button } from '@mui/material'
 import type { To } from 'react-router-dom'
 import Typography from '@mui/material/Typography'
 import { formatDistanceToNow } from 'date-fns'
@@ -24,7 +24,7 @@ const SingleTodo = () => {
 	const [editedTitle, setEditedTitle] = useState(todo?.title)
 	const [editedDescription, setEditedDescription] = useState(todo?.description)
 
-	const { data, isError: isErrorGettingTodo } = useGetTodoByIdQuery(params._id!, { skip: !params._id })
+	const { data, isError: isErrorGettingTodo, refetch } = useGetTodoByIdQuery(params._id!, { skip: !params._id })
 
 	const [updateTodoToBackend, { isError: isErrorUpdatingTodo }] = useUpdateTodoQueryMutation()
 
@@ -62,6 +62,10 @@ const SingleTodo = () => {
 		updateTodoToBackend({ _id: todo._id, completed: !todo.completed })
 	}
 
+	const handleRefresh = () => {
+		refetch()
+	}
+
 	return (
 		<div>
 			<Stack p={3}>
@@ -97,6 +101,9 @@ const SingleTodo = () => {
 					</CardContent>
 				</Card>
 			</Stack>
+			<Button color="inherit" variant="outlined" onClick={handleRefresh}>
+				Refresh
+			</Button>
 		</div>
 	)
 }
