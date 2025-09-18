@@ -31,6 +31,7 @@ const Todos = () => {
 		isError: isGettingError,
 	} = useGetTodosQuery(filters, {
 		skip: !user?.access_token,
+		pollingInterval: 5000,
 	})
 
 	const [addTodoToBackend, { isLoading: isAddingTodo, isError: isAddingError }] = useAddTodoQueryMutation()
