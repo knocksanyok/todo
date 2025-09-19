@@ -1,15 +1,22 @@
 import { useNavigate } from 'react-router'
 import Button from '@mui/material/Button'
 
-const About = () => {
-	const navigate = useNavigate()
+const About = ({ title, version, onClick }: { title: string; version: string; onClick: () => void }) => {
+	// const navigate = useNavigate()
 	return (
-		<div>
-			<h1>About Us</h1>
-			<span>Version 1.0.0</span>
-			<Button variant={'contained'} onClick={() => navigate(-1)}>
-				Go Back
+		<div style={{ backgroundColor: 'violet' }}>
+			<h1>{title}</h1>
+			<span>{version}</span>
+			<Button
+				onClick={() => {
+					onClick()
+				}}
+			>
+				Жмякай
 			</Button>
+			{/*<Button variant={'contained'} onClick={() => navigate(-1)}>*/}
+			{/*	Go Back*/}
+			{/*</Button>*/}
 		</div>
 	)
 }

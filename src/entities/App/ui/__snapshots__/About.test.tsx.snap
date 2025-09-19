@@ -1,0 +1,31 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`About component > renders correctly 1`] = `
+<body>
+  <div>
+    <div>
+      <h1>
+        About Us
+      </h1>
+      <span
+        data-testid="version-container"
+      >
+        Version 1.0.0
+      </span>
+      <button
+        class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary css-1uent87-MuiButtonBase-root-MuiButton-root"
+        data-testid="increment-button"
+        tabindex="0"
+        type="button"
+      >
+        Click
+      </button>
+      <span
+        data-testid="counter"
+      >
+        0
+      </span>
+    </div>
+  </div>
+</body>
+`;
