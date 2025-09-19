@@ -7,7 +7,8 @@
     "dev": "vite --host",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -19,6 +20,7 @@
     "@uidotdev/usehooks": "^2.4.1",
     "axios": "^1.11.0",
     "date-fns": "^4.1.0",
+    "happy-dom": "^18.0.1",
     "jwt-decode": "^4.0.0",
     "notistack": "^3.0.2",
     "react": "^19.1.1",
@@ -32,8 +34,10 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
-    "@types/react": "^19.1.10",
-    "@types/react-dom": "^19.1.7",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.0",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.0",
     "eslint": "^9.34.0",
     "eslint-config-prettier": "^10.1.8",
@@ -44,6 +48,7 @@
     "prettier": "3.6.2",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.39.1",
-    "vite": "^7.1.2"
+    "vite": "^7.1.2",
+    "vitest": "^3.2.4"
   }
 }
