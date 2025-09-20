@@ -12,7 +12,14 @@ export const userApiRTK = rtkApi.injectEndpoints({
 				body: loginInf,
 			}),
 		}),
+		registerUser: builder.mutation<void, UserTypeLogin>({
+			query: (registerInf) => ({
+				url: `/auth/register`,
+				method: 'POST',
+				body: registerInf,
+			}),
+		}),
 	}),
 })
 
-export const { useLoginUserMutation } = userApiRTK
+export const { useLoginUserMutation, useRegisterUserMutation } = userApiRTK

@@ -40,21 +40,21 @@ const Login = () => {
 		event.preventDefault()
 	}
 
-	const [loginUser, { data, isLoading, isError }] = useLoginUserMutation()
+	const [loginUser, { data, isLoading, isError, isSuccess }] = useLoginUserMutation()
 
 	const handleLogin = () => {
 		loginUser({ username: username, password: password })
 	}
 
 	useEffect(() => {
-		if (data?.access_token) {
+		if (data?.access_token && isSuccess) {
 			localStorage.setItem('access_token', data.access_token)
 			dispatch(setUser(data))
 			enqueueSnackbar('Welcome', { variant: 'success' })
 			const backPath = previousLocation?.back || '/'
 			navigate(backPath)
 		}
-	}, [data])
+	}, [data, isSuccess])
 
 	useEffect(() => {
 		if (isError) {
