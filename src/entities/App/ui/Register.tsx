@@ -3,21 +3,18 @@ import { Container, InputAdornment, Stack, TextField } from '@mui/material'
 import IconButton from '@mui/material/IconButton'
 import Button from '@mui/material/Button'
 import LockIcon from '@mui/icons-material/Lock'
-import { type SyntheticEvent, useState } from 'react'
-import { jwtDecode } from 'jwt-decode'
+import { type SyntheticEvent, useEffect, useState } from 'react'
 import * as React from 'react'
-import { rootApi } from '../../../shared/api/rootApi.ts'
 import { useSnackbar } from 'notistack'
-import type { AxiosError } from 'axios'
-import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
+
+import { useAppDispatch } from '../../../app/store.ts'
 import { useNavigate } from 'react-router'
-import { selectIsLoading, setIsLoading, setUser } from '../../User/model/store/userStore.ts'
-import type { UserType } from '../../User/model/userType.ts'
+import { setUser } from '../../User/model/store/userStore.ts'
+import { useLoginUserMutation, useRegisterUserMutation } from '../../User/api/userApi.ts'
 
 const Register = () => {
 	const navigate = useNavigate()
 	const dispatch = useAppDispatch()
-	const loading = useAppSelector(selectIsLoading)
 
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
@@ -32,34 +29,6 @@ const Register = () => {
 	const handlePasswordChange = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) =>
 		setPassword(e.currentTarget.value)
 
-	const handleRegister = async () => {
-		dispatch(setIsLoading(true))
-		try {
-			const registerData = await rootApi.post<UserType>('/auth/register', {
-				username: username,
-				password: password,
-			})
-			if (registerData.status === 201) {
-				const loginData = await rootApi.post<UserType>('/auth/login', { username: username, password: password })
-
-				const accessToken = loginData.data.access_token
-				localStorage.setItem('accessToken', accessToken)
-				console.warn(jwtDecode(accessToken))
-
-				dispatch(setUser(loginData.data))
-				dispatch(setIsLoading(false))
-				enqueueSnackbar('Registration successful', { variant: 'success' })
-				navigate('/')
-			}
-		} catch (error) {
-			const axiousError = error as AxiosError<{ message: string }>
-			enqueueSnackbar(axiousError.response?.data.message || 'Unknown error', { variant: 'error' })
-			dispatch(setIsLoading(false))
-		} finally {
-			dispatch(setIsLoading(false))
-		}
-	}
-
 	const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
 		event.preventDefault()
 	}
@@ -68,11 +37,40 @@ const Register = () => {
 		event.preventDefault()
 	}
 
+	const [loginUser, { data: dataLogin, isSuccess: isSuccessLogin }] = useLoginUserMutation()
+	const [registerUser, { data: dataRegister, isSuccess: isSuccessRegister, isError, isLoading }] =
+		useRegisterUserMutation()
+
+	const handleRegister = () => {
+		registerUser({ username: username, password: password })
+	}
+
+	useEffect(() => {
+		if (isSuccessRegister && dataRegister) {
+			loginUser({ username: username, password: password })
+		}
+	}, [isSuccessRegister, dataRegister])
+
+	useEffect(() => {
+		if (dataLogin?.access_token && isSuccessLogin) {
+			localStorage.setItem('access_token', dataLogin.access_token)
+			dispatch(setUser(dataLogin))
+			enqueueSnackbar('Welcome', { variant: 'success' })
+			navigate('/')
+		}
+	}, [dataLogin, isSuccessLogin])
+
+	useEffect(() => {
+		if (isError) {
+			enqueueSnackbar('Registration failed', { variant: 'error' })
+		}
+	}, [isError])
+
 	return (
 		<Container maxWidth={'sm'}>
 			<Stack spacing={2}>
 				<TextField
-					disabled={loading}
+					disabled={isLoading}
 					value={username}
 					onChange={handleUserNameChange}
 					size="medium"
@@ -89,7 +87,7 @@ const Register = () => {
 					}}
 				/>
 				<TextField
-					disabled={loading}
+					disabled={isLoading}
 					value={password}
 					onChange={handlePasswordChange}
 					size="medium"
@@ -122,11 +120,11 @@ const Register = () => {
 				<Button
 					onClick={handleRegister}
 					variant={'contained'}
-					loading={loading}
+					loading={isLoading}
 					loadingPosition={'start'}
 					sx={{ backgroundColor: '#dc004e' }}
 				>
-					{loading ? 'Loading...' : 'Register'}
+					{isLoading ? 'Loading...' : 'Register'}
 				</Button>
 			</Stack>
 		</Container>
