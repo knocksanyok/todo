@@ -3,28 +3,24 @@ import { Container, InputAdornment, Stack, TextField } from '@mui/material'
 import IconButton from '@mui/material/IconButton'
 import Button from '@mui/material/Button'
 import LockIcon from '@mui/icons-material/Lock'
-import { type SyntheticEvent, useState } from 'react'
-import { jwtDecode } from 'jwt-decode'
+import { type SyntheticEvent, useEffect, useState } from 'react'
 import * as React from 'react'
 
-import { rootApi } from '../../../shared/api/rootApi.ts'
 import { useSnackbar } from 'notistack'
-import type { AxiosError } from 'axios'
 
-import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
+import { useAppDispatch } from '../../../app/store.ts'
 import { useLocation, useNavigate } from 'react-router'
-import type { UserType } from '../../User/model/userType.ts'
-import { selectIsLoading, setIsLoading, setUser } from '../../User/model/store/userStore.ts'
+import { setUser } from '../../User/model/store/userStore.ts'
+import { useLoginUserMutation } from '../../User/api/userApi.ts'
 
 const Login = () => {
 	const navigate = useNavigate()
-
 	const dispatch = useAppDispatch()
-	const loading = useAppSelector(selectIsLoading)
 
 	const [showPassword, setShowPassword] = React.useState(false)
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
+
 	const { enqueueSnackbar } = useSnackbar()
 	const previousLocation = useLocation().state
 
@@ -36,31 +32,6 @@ const Login = () => {
 	const handlePasswordChange = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) =>
 		setPassword(e.currentTarget.value)
 
-	const handleLogin = async () => {
-		dispatch(setIsLoading(true))
-		try {
-			const loginData = await rootApi.post<UserType>('/auth/login', { username: username, password: password })
-
-			const accessToken = loginData.data.access_token
-			localStorage.setItem('accessToken', accessToken)
-			console.warn(jwtDecode(accessToken))
-			console.log('Auth', loginData.data)
-			const setUserAction = setUser(loginData.data)
-			console.log(setUserAction)
-			dispatch(setUser(loginData.data))
-			dispatch(setIsLoading(false))
-			enqueueSnackbar('Welcome', { variant: 'success' })
-			const backPath = previousLocation?.back || '/'
-			navigate(backPath)
-		} catch (error) {
-			const axiousError = error as AxiosError<{ message: string }>
-			enqueueSnackbar(axiousError.response?.data.message || 'Unknown error', { variant: 'error' })
-			dispatch(setIsLoading(false))
-		} finally {
-			dispatch(setIsLoading(false))
-		}
-	}
-
 	const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
 		event.preventDefault()
 	}
@@ -69,11 +40,33 @@ const Login = () => {
 		event.preventDefault()
 	}
 
+	const [loginUser, { data, isLoading, isError }] = useLoginUserMutation()
+
+	const handleLogin = () => {
+		loginUser({ username: username, password: password })
+	}
+
+	useEffect(() => {
+		if (data?.access_token) {
+			localStorage.setItem('access_token', data.access_token)
+			dispatch(setUser(data))
+			enqueueSnackbar('Welcome', { variant: 'success' })
+			const backPath = previousLocation?.back || '/'
+			navigate(backPath)
+		}
+	}, [data])
+
+	useEffect(() => {
+		if (isError) {
+			enqueueSnackbar('Login failed', { variant: 'error' })
+		}
+	}, [isError])
+
 	return (
 		<Container maxWidth={'sm'}>
 			<Stack spacing={2}>
 				<TextField
-					disabled={loading}
+					disabled={isLoading}
 					value={username}
 					onChange={handleUserNameChange}
 					size="medium"
@@ -90,7 +83,7 @@ const Login = () => {
 					}}
 				/>
 				<TextField
-					disabled={loading}
+					disabled={isLoading}
 					value={password}
 					onChange={handlePasswordChange}
 					size="medium"
@@ -123,11 +116,11 @@ const Login = () => {
 				<Button
 					onClick={handleLogin}
 					variant={'contained'}
-					loading={loading}
+					loading={isLoading}
 					loadingPosition={'start'}
 					sx={{ backgroundColor: '#1976d2' }}
 				>
-					{loading ? 'Loading...' : 'Login'}
+					{isLoading ? 'Loading...' : 'Login'}
 				</Button>
 			</Stack>
 		</Container>
