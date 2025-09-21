@@ -37,8 +37,8 @@ const Login = () => {
 
 	const [loginUser, { data, isLoading, isError, isSuccess }] = useLoginUserMutation()
 
-	const stringSchema = object({
-		email: string().email({ message: 'Invalid email' }),
+	const loginSchema = object({
+		username: string().email({ message: 'Invalid email' }),
 		password: string()
 			.min(3, { message: 'Password must be at least 3 characters' })
 			.max(10, { message: 'Password must be less than 10 characters' }),
@@ -48,7 +48,7 @@ const Login = () => {
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useForm({ resolver: yupResolver(stringSchema) })
+	} = useForm({ resolver: yupResolver(loginSchema) })
 
 	const onSubmit = (data) => loginUser(data)
 
@@ -74,9 +74,9 @@ const Login = () => {
 				<Stack spacing={2}>
 					<TextField
 						disabled={isLoading}
-						{...register('email')}
-						error={!!errors.email}
-						helperText={errors?.email?.message?.message || ''}
+						{...register('username')}
+						error={!!errors.username}
+						helperText={errors?.username?.message?.message || ''}
 						size="medium"
 						label="Email"
 						variant="filled"
@@ -93,6 +93,8 @@ const Login = () => {
 					<TextField
 						disabled={isLoading}
 						{...register('password')}
+						error={!!errors.password}
+						helperText={errors?.password?.message?.message || ''}
 						size="medium"
 						label="Password"
 						type={showPassword ? 'text' : 'password'}

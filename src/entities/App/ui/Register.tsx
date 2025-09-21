@@ -3,7 +3,7 @@ import { Container, InputAdornment, Stack, TextField } from '@mui/material'
 import IconButton from '@mui/material/IconButton'
 import Button from '@mui/material/Button'
 import LockIcon from '@mui/icons-material/Lock'
-import { type SyntheticEvent, useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import * as React from 'react'
 import { useSnackbar } from 'notistack'
 
@@ -11,23 +11,18 @@ import { useAppDispatch } from '../../../app/store.ts'
 import { useNavigate } from 'react-router'
 import { setUser } from '../../User/model/store/userStore.ts'
 import { useLoginUserMutation, useRegisterUserMutation } from '../../User/api/userApi.ts'
+import * as z from 'zod'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 const Register = () => {
 	const navigate = useNavigate()
 	const dispatch = useAppDispatch()
 
-	const [username, setUsername] = useState('')
-	const [password, setPassword] = useState('')
 	const [showPassword, setShowPassword] = React.useState(false)
 	const { enqueueSnackbar } = useSnackbar()
 
 	const handleClickShowPassword = () => setShowPassword((show) => !show)
-
-	const handleUserNameChange = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) =>
-		setUsername(e.currentTarget.value)
-
-	const handlePasswordChange = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) =>
-		setPassword(e.currentTarget.value)
 
 	const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
 		event.preventDefault()
@@ -38,18 +33,26 @@ const Register = () => {
 	}
 
 	const [loginUser, { data: dataLogin, isSuccess: isSuccessLogin }] = useLoginUserMutation()
-	const [registerUser, { data: dataRegister, isSuccess: isSuccessRegister, isError, isLoading }] =
-		useRegisterUserMutation()
+	const [registerUser, { isError, isLoading }] = useRegisterUserMutation()
 
-	const handleRegister = () => {
-		registerUser({ username: username, password: password })
+	const registerSchema = z.object({
+		username: z.email({ message: 'Invalid email.' }),
+		password: z
+			.string()
+			.min(3, { message: 'Password must be at least 3 characters long' })
+			.max(10, { message: 'Password must be less than 10 characters' }),
+	})
+
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm({ resolver: zodResolver(registerSchema) })
+
+	const onSubmit = async (data) => {
+		await registerUser(data)
+		loginUser(data)
 	}
-
-	useEffect(() => {
-		if (isSuccessRegister && dataRegister) {
-			loginUser({ username: username, password: password })
-		}
-	}, [isSuccessRegister, dataRegister])
 
 	useEffect(() => {
 		if (dataLogin?.access_token && isSuccessLogin) {
@@ -68,65 +71,69 @@ const Register = () => {
 
 	return (
 		<Container maxWidth={'sm'}>
-			<Stack spacing={2}>
-				<TextField
-					disabled={isLoading}
-					value={username}
-					onChange={handleUserNameChange}
-					size="medium"
-					label="UserName"
-					variant="filled"
-					slotProps={{
-						input: {
-							startAdornment: (
-								<InputAdornment position="start">
-									<AccountCircle />
-								</InputAdornment>
-							),
-						},
-					}}
-				/>
-				<TextField
-					disabled={isLoading}
-					value={password}
-					onChange={handlePasswordChange}
-					size="medium"
-					label="Password"
-					type={showPassword ? 'password' : 'text'}
-					variant="filled"
-					slotProps={{
-						input: {
-							startAdornment: (
-								<InputAdornment position="start">
-									<LockIcon />
-								</InputAdornment>
-							),
-							endAdornment: (
-								<InputAdornment position="end">
-									<IconButton
-										aria-label={showPassword ? 'hide the password' : 'display the password'}
-										onClick={handleClickShowPassword}
-										onMouseDown={handleMouseDownPassword}
-										onMouseUp={handleMouseUpPassword}
-										edge="end"
-									>
-										{showPassword ? <VisibilityOff /> : <Visibility />}
-									</IconButton>
-								</InputAdornment>
-							),
-						},
-					}}
-				/>
-				<Button
-					onClick={handleRegister}
-					variant={'contained'}
-					loading={isLoading}
-					loadingPosition={'start'}
-					sx={{ backgroundColor: '#dc004e' }}
-				>
-					{isLoading ? 'Loading...' : 'Register'}
-				</Button>
-			</Stack>
+			<form onSubmit={handleSubmit(onSubmit)}>
+				<Stack spacing={2}>
+					<TextField
+						disabled={isLoading}
+						{...register('username')}
+						error={!!errors.username}
+						helperText={errors?.username?.message || ''}
+						size="medium"
+						label="Email"
+						variant="filled"
+						slotProps={{
+							input: {
+								startAdornment: (
+									<InputAdornment position="start">
+										<AccountCircle />
+									</InputAdornment>
+								),
+							},
+						}}
+					/>
+					<TextField
+						disabled={isLoading}
+						{...register('password')}
+						error={!!errors.password}
+						helperText={errors?.password?.message || ''}
+						size="medium"
+						label="Password"
+						type={showPassword ? 'password' : 'text'}
+						variant="filled"
+						slotProps={{
+							input: {
+								startAdornment: (
+									<InputAdornment position="start">
+										<LockIcon />
+									</InputAdornment>
+								),
+								endAdornment: (
+									<InputAdornment position="end">
+										<IconButton
+											aria-label={showPassword ? 'hide the password' : 'display the password'}
+											onClick={handleClickShowPassword}
+											onMouseDown={handleMouseDownPassword}
+											onMouseUp={handleMouseUpPassword}
+											edge="end"
+										>
+											{showPassword ? <VisibilityOff /> : <Visibility />}
+										</IconButton>
+									</InputAdornment>
+								),
+							},
+						}}
+					/>
+					<Button
+						type="submit"
+						variant={'contained'}
+						loading={isLoading}
+						loadingPosition={'start'}
+						sx={{ backgroundColor: '#dc004e' }}
+					>
+						{isLoading ? 'Loading...' : 'Register'}
+					</Button>
+				</Stack>
+			</form>
 		</Container>
 	)
 }
