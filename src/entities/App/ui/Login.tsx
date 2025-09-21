@@ -3,7 +3,7 @@ import { Container, InputAdornment, Stack, TextField } from '@mui/material'
 import IconButton from '@mui/material/IconButton'
 import Button from '@mui/material/Button'
 import LockIcon from '@mui/icons-material/Lock'
-import { type SyntheticEvent, useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import * as React from 'react'
 
 import { useSnackbar } from 'notistack'
@@ -12,25 +12,20 @@ import { useAppDispatch } from '../../../app/store.ts'
 import { useLocation, useNavigate } from 'react-router'
 import { setUser } from '../../User/model/store/userStore.ts'
 import { useLoginUserMutation } from '../../User/api/userApi.ts'
+import { object, string } from 'yup'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
 
 const Login = () => {
 	const navigate = useNavigate()
 	const dispatch = useAppDispatch()
 
 	const [showPassword, setShowPassword] = React.useState(false)
-	const [username, setUsername] = useState('')
-	const [password, setPassword] = useState('')
 
 	const { enqueueSnackbar } = useSnackbar()
 	const previousLocation = useLocation().state
 
 	const handleClickShowPassword = () => setShowPassword((show) => !show)
-
-	const handleUserNameChange = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) =>
-		setUsername(e.currentTarget.value)
-
-	const handlePasswordChange = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) =>
-		setPassword(e.currentTarget.value)
 
 	const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
 		event.preventDefault()
@@ -42,9 +37,20 @@ const Login = () => {
 
 	const [loginUser, { data, isLoading, isError, isSuccess }] = useLoginUserMutation()
 
-	const handleLogin = () => {
-		loginUser({ username: username, password: password })
-	}
+	const stringSchema = object({
+		email: string().email({ message: 'Invalid email' }),
+		password: string()
+			.min(3, { message: 'Password must be at least 3 characters' })
+			.max(10, { message: 'Password must be less than 10 characters' }),
+	})
+
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm({ resolver: yupResolver(stringSchema) })
+
+	const onSubmit = (data) => loginUser(data)
 
 	useEffect(() => {
 		if (data?.access_token && isSuccess) {
@@ -64,65 +70,67 @@ const Login = () => {
 
 	return (
 		<Container maxWidth={'sm'}>
-			<Stack spacing={2}>
-				<TextField
-					disabled={isLoading}
-					value={username}
-					onChange={handleUserNameChange}
-					size="medium"
-					label="UserName"
-					variant="filled"
-					slotProps={{
-						input: {
-							startAdornment: (
-								<InputAdornment position="start">
-									<AccountCircle />
-								</InputAdornment>
-							),
-						},
-					}}
-				/>
-				<TextField
-					disabled={isLoading}
-					value={password}
-					onChange={handlePasswordChange}
-					size="medium"
-					label="Password"
-					type={showPassword ? 'text' : 'password'}
-					variant="filled"
-					slotProps={{
-						input: {
-							startAdornment: (
-								<InputAdornment position="start">
-									<LockIcon />
-								</InputAdornment>
-							),
-							endAdornment: (
-								<InputAdornment position="end">
-									<IconButton
-										aria-label={showPassword ? 'hide the password' : 'display the password'}
-										onClick={handleClickShowPassword}
-										onMouseDown={handleMouseDownPassword}
-										onMouseUp={handleMouseUpPassword}
-										edge="end"
-									>
-										{showPassword ? <VisibilityOff /> : <Visibility />}
-									</IconButton>
-								</InputAdornment>
-							),
-						},
-					}}
-				/>
-				<Button
-					onClick={handleLogin}
-					variant={'contained'}
-					loading={isLoading}
-					loadingPosition={'start'}
-					sx={{ backgroundColor: '#1976d2' }}
-				>
-					{isLoading ? 'Loading...' : 'Login'}
-				</Button>
-			</Stack>
+			<form onSubmit={handleSubmit(onSubmit)}>
+				<Stack spacing={2}>
+					<TextField
+						disabled={isLoading}
+						{...register('email')}
+						error={!!errors.email}
+						helperText={errors?.email?.message?.message || ''}
+						size="medium"
+						label="Email"
+						variant="filled"
+						slotProps={{
+							input: {
+								startAdornment: (
+									<InputAdornment position="start">
+										<AccountCircle />
+									</InputAdornment>
+								),
+							},
+						}}
+					/>
+					<TextField
+						disabled={isLoading}
+						{...register('password')}
+						size="medium"
+						label="Password"
+						type={showPassword ? 'text' : 'password'}
+						variant="filled"
+						slotProps={{
+							input: {
+								startAdornment: (
+									<InputAdornment position="start">
+										<LockIcon />
+									</InputAdornment>
+								),
+								endAdornment: (
+									<InputAdornment position="end">
+										<IconButton
+											aria-label={showPassword ? 'hide the password' : 'display the password'}
+											onClick={handleClickShowPassword}
+											onMouseDown={handleMouseDownPassword}
+											onMouseUp={handleMouseUpPassword}
+											edge="end"
+										>
+											{showPassword ? <VisibilityOff /> : <Visibility />}
+										</IconButton>
+									</InputAdornment>
+								),
+							},
+						}}
+					/>
+					<Button
+						type="submit"
+						variant={'contained'}
+						loading={isLoading}
+						loadingPosition={'start'}
+						sx={{ backgroundColor: '#1976d2' }}
+					>
+						{isLoading ? 'Loading...' : 'Login'}
+					</Button>
+				</Stack>
+			</form>
 		</Container>
 	)
 }
