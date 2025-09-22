@@ -11,6 +11,8 @@ import { useAppDispatch } from '../../../app/store.ts'
 import { setTodo } from '../model/store/todosStore.ts'
 import { useDeleteTodoQueryMutation, useUpdateTodoQueryMutation } from '../api/todoApi.ts'
 import { NavLink } from 'react-router'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 type TodoProps = {
 	todo: TodoType
@@ -24,6 +26,9 @@ export const Todo = memo(
 
 		const [editedTitle, setEditedTitle] = useState(todo.title)
 		const [editedDescription, setEditedDescription] = useState(todo.description)
+
+		const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: todo._id })
+		const style = { transition, transform: CSS.Translate.toString(transform) }
 
 		const dispatch = useAppDispatch()
 
@@ -87,7 +92,7 @@ export const Todo = memo(
 		}
 
 		return (
-			<Card variant="outlined" sx={{ maxWidth: 200 }}>
+			<Card variant="outlined" sx={{ maxWidth: 200 }} ref={setNodeRef} style={style} {...attributes} {...listeners}>
 				<CardContent>
 					{isTitle ? (
 						<>
