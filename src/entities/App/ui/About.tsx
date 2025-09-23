@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router'
 import Button from '@mui/material/Button'
+import DropZone from '../../../shared/ui-kit/DropZone.tsx'
 
 const About = () => {
 	const navigate = useNavigate()
@@ -10,6 +11,7 @@ const About = () => {
 			<Button variant={'contained'} onClick={() => navigate(-1)}>
 				Go Back
 			</Button>
+			<DropZone></DropZone>
 		</div>
 	)
 }
