@@ -14,13 +14,14 @@ import { useSelector } from 'react-redux'
 import { useAppDispatch } from '../../app/store.ts'
 import { NavLink, useLocation, useNavigate } from 'react-router'
 import { useGetAllTodosQuery } from '../../entities/Todo/api/todoApi.ts'
+import { useEffect, useState } from 'react'
 
 const ButtonAppBar = () => {
 	const dispatch = useAppDispatch()
+	const [totalTodos, setTotalTodos] = useState<number | string>('loading')
+	const [undoneTodos, setUndoneTodos] = useState<number | string>('loading')
 
 	const { data } = useGetAllTodosQuery()
-	const totalTodos = data?.length
-	const unDoneTodos = data?.filter((todo) => !todo.completed).length
 
 	const username = useSelector(selectUser)
 
@@ -31,16 +32,23 @@ const ButtonAppBar = () => {
 
 	const { mode, setMode } = useColorScheme()
 
-	if (!mode) return null
-
 	const handleLogout = () => {
-		localStorage.removeItem('accessToken')
+		localStorage.removeItem('access_token')
 		dispatch(removeUser())
 	}
 
 	const handleRedirectToProfile = () => {
 		navigate('/profile')
 	}
+
+	useEffect(() => {
+		if (data) {
+			setUndoneTodos(data?.filter((todo) => !todo.completed).length)
+			setTotalTodos(data.length)
+		}
+	}, [data])
+
+	if (!mode) return null
 
 	return (
 		<Box sx={{ flexGrow: 1 }}>
@@ -52,7 +60,7 @@ const ButtonAppBar = () => {
 					<Stack direction={'row'} spacing={2} style={{ flexGrow: 1 }}>
 						{username && (
 							<Typography variant="h6" component="div">
-								Undone Todos - {' ' + unDoneTodos}, All -{' ' + totalTodos}
+								Undone Todos - {undoneTodos}, All -{totalTodos}
 							</Typography>
 						)}
 						<Typography variant="h6" component="div">

@@ -8,13 +8,14 @@ import * as React from 'react'
 
 import { useSnackbar } from 'notistack'
 
-import { useAppDispatch } from '../../../app/store.ts'
+import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
 import { useLocation, useNavigate } from 'react-router'
-import { setUser } from '../../User/model/store/userStore.ts'
+import { selectUser, setUser } from '../../User/model/store/userStore.ts'
 import { useLoginUserMutation } from '../../User/api/userApi.ts'
 import { object, string } from 'yup'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { autoLogin } from '../../../shared/util /autoLogin.ts'
 
 const Login = () => {
 	const navigate = useNavigate()
@@ -67,6 +68,11 @@ const Login = () => {
 			enqueueSnackbar('Login failed', { variant: 'error' })
 		}
 	}, [isError])
+
+	// const user = useAppSelector(selectUser)
+	// console.log(user, 'LOGIN STATE')
+	// const userFromLs = autoLogin()
+	// console.log(userFromLs, 'LOGIN USER FROM LS')
 
 	return (
 		<Container maxWidth={'sm'}>

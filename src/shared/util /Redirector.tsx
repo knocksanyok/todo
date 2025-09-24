@@ -8,8 +8,6 @@ const Redirector = () => {
 	const userFromLs = autoLogin()
 	const dispatch = useAppDispatch()
 
-	console.log(userFromLs, 'From Redirector')
-
 	if (!user && !userFromLs) {
 		return <Navigate to={`/auth/login`} state={{ back: location.pathname }} />
 	}
