@@ -1,9 +1,8 @@
-import { CircularProgress, Container, Input, Stack } from '@mui/material'
+import { CircularProgress, Container, Stack } from '@mui/material'
 import { Todo } from './Todo.tsx'
-import { type ChangeEvent, useEffect, useState } from 'react'
-import Button from '@mui/material/Button'
+import { useEffect, useState } from 'react'
 
-import { useAddTodoQueryMutation, useGetTodosQuery, useUpdateTodoQueryMutation } from '../api/todoApi.ts'
+import { useGetTodosQuery, useUpdateTodoQueryMutation } from '../api/todoApi.ts'
 import { useSnackbar } from 'notistack'
 import { useAppSelector } from '../../../app/store.ts'
 import { selectFilters } from '../model/store/todosStore.ts'
@@ -19,6 +18,7 @@ import {
 } from '@dnd-kit/core'
 import type { TodoType } from '../model/todoType.ts'
 import { arrayMove, rectSwappingStrategy, SortableContext } from '@dnd-kit/sortable'
+import TodosAddButtons from './TodosAddButtons.tsx'
 
 const Todos = () => {
 	const { enqueueSnackbar } = useSnackbar()
@@ -43,35 +43,12 @@ const Todos = () => {
 		}
 	}
 
-	const [newTodoTitle, setNewTodoTitle] = useState('')
-	const [newTodoDescription, setNewTodoDescription] = useState('')
-
-	const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setNewTodoTitle(e.target.value)
-	}
-
-	const handleDescriptionChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setNewTodoDescription(e.target.value)
-	}
-
-	const handleAddTodo = () => {
-		addTodoToBackend({ title: newTodoTitle, description: newTodoDescription })
-	}
-
-	const [addTodoToBackend, { isLoading: isAddingTodo, isError: isAddingError }] = useAddTodoQueryMutation()
 	const [updateTodoToBackend] = useUpdateTodoQueryMutation()
 
-	const {
-		data,
-		isLoading: isGettingTodos,
-		isError: isGettingError,
-	} = useGetTodosQuery(filters, {
+	const { data, isLoading, isError } = useGetTodosQuery(filters, {
 		skip: !user?.access_token,
 		// pollingInterval: 5000,
 	})
-
-	const isLoading = isAddingTodo || isGettingTodos
-	const isError = isGettingError || isAddingError
 
 	useEffect(() => {
 		if (data) {
@@ -91,11 +68,7 @@ const Todos = () => {
 
 	return (
 		<Container style={{ touchAction: 'none' }}>
-			<Input placeholder={'title'} value={newTodoTitle} onChange={handleTitleChange} />
-			<Input placeholder={'description'} value={newTodoDescription} onChange={handleDescriptionChange} />
-			<Button disabled={!newTodoTitle} onClick={handleAddTodo}>
-				Add
-			</Button>
+			<TodosAddButtons></TodosAddButtons>
 			<DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
 				<SortableContext items={todos.map((todo) => todo._id)} strategy={rectSwappingStrategy}>
 					<Stack flexWrap={'wrap'} spacing={2} direction={'row'}>
