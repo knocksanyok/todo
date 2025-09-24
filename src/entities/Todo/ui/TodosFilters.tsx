@@ -13,7 +13,7 @@ import {
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import { useThrottledCallback } from 'use-debounce'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useGetAllTodosQuery } from '../api/todoApi.ts'
 import { selectUser } from '../../User/model/store/userStore.ts'
 
@@ -27,9 +27,6 @@ const TodosFilters = () => {
 	const todosLength = data?.length
 	const shownTodos = filters.page * filters.limit
 
-	console.log(todosLength)
-	console.log(filters.limit)
-
 	const [query, setQuery] = useState('')
 
 	const handleSearchDispatch = () => {
@@ -39,7 +36,8 @@ const TodosFilters = () => {
 	const throttledSearch = useThrottledCallback(handleSearchDispatch, 300)
 
 	const handleChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setQuery(e.target.value)
+		const inputValue = e.target.value
+		setQuery(inputValue)
 		throttledSearch()
 	}
 
@@ -60,6 +58,10 @@ const TodosFilters = () => {
 		if (todosLength! < filters.limit) return
 		dispatch(setPage(filters.page + 1))
 	}
+
+	useEffect(() => {
+		dispatch(setSearch(query))
+	}, [dispatch, query])
 
 	return (
 		<>
