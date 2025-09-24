@@ -11,17 +11,18 @@ import WbSunnyIcon from '@mui/icons-material/WbSunny'
 import BedTimeIcon from '@mui/icons-material/BedTime'
 import { removeUser, selectUser } from '../../entities/User/model/store/userStore.ts'
 import { useSelector } from 'react-redux'
-import { useAppDispatch } from '../../app/store.ts'
+import { useAppDispatch, useAppSelector } from '../../app/store.ts'
 import { NavLink, useLocation, useNavigate } from 'react-router'
 import { useGetAllTodosQuery } from '../../entities/Todo/api/todoApi.ts'
-import { useEffect, useState } from 'react'
 
 const ButtonAppBar = () => {
 	const dispatch = useAppDispatch()
-	const [totalTodos, setTotalTodos] = useState<number | string>('loading')
-	const [undoneTodos, setUndoneTodos] = useState<number | string>('loading')
 
-	const { data } = useGetAllTodosQuery()
+	const user = useAppSelector(selectUser)
+
+	const { data, isLoading, isSuccess } = useGetAllTodosQuery(undefined, { skip: !user?.access_token })
+	const undoneTodos = data?.filter((todo) => !todo.completed).length
+	const totalTodos = data?.length
 
 	const username = useSelector(selectUser)
 
@@ -41,13 +42,6 @@ const ButtonAppBar = () => {
 		navigate('/profile')
 	}
 
-	useEffect(() => {
-		if (data) {
-			setUndoneTodos(data?.filter((todo) => !todo.completed).length)
-			setTotalTodos(data.length)
-		}
-	}, [data])
-
 	if (!mode) return null
 
 	return (
@@ -60,7 +54,8 @@ const ButtonAppBar = () => {
 					<Stack direction={'row'} spacing={2} style={{ flexGrow: 1 }}>
 						{username && (
 							<Typography variant="h6" component="div">
-								Undone Todos - {undoneTodos}, All -{totalTodos}
+								Undone Todos - {isLoading && isSuccess ? 'loading' : undoneTodos}, All -
+								{isLoading && isSuccess ? 'loading' : totalTodos}
 							</Typography>
 						)}
 						<Typography variant="h6" component="div">
