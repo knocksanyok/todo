@@ -95,7 +95,7 @@ const SingleTodo = () => {
 								</IconButton>
 							</>
 						)}
-						<Typography>{todo.createdAt}</Typography>
+						<Typography>{new Date(todo.createdAt).toLocaleString()}</Typography>
 						<Typography>Time for last update:{formatDistanceToNow(todo.updatedAt)}</Typography>
 						<Checkbox checked={todo.completed} onClick={handleCheckClick}></Checkbox>
 					</CardContent>
