@@ -54,8 +54,8 @@ const ButtonAppBar = () => {
 					<Stack direction={'row'} spacing={2} style={{ flexGrow: 1 }}>
 						{username && (
 							<Typography variant="h6" component="div">
-								Undone Todos - {isLoading && isSuccess ? 'loading' : undoneTodos}, All -
-								{isLoading && isSuccess ? 'loading' : totalTodos}
+								Undone Todos - {isLoading && isSuccess ? '' : undoneTodos}, All -
+								{isLoading && isSuccess ? '' : totalTodos}
 							</Typography>
 						)}
 						<Typography variant="h6" component="div">

@@ -1,12 +1,5 @@
 import { useAppDispatch, useAppSelector } from '../../../app/store.js'
-import {
-	selectFilters,
-	selectTodos,
-	setCompletedFilter,
-	setLimit,
-	setPage,
-	setSearch,
-} from '../model/store/todosStore.js'
+import { selectFilters, setCompletedFilter, setLimit, setPage, setSearch } from '../model/store/todosStore.js'
 import {
 	Accordion,
 	AccordionDetails,
@@ -21,11 +14,18 @@ import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import { useThrottledCallback } from 'use-debounce'
 import { useState } from 'react'
+import { useGetAllTodosQuery } from '../api/todoApi.ts'
+import { selectUser } from '../../User/model/store/userStore.ts'
 
 const TodosFilters = () => {
 	const filters = useAppSelector(selectFilters)
-	const todosLength = useAppSelector(selectTodos).length
 	const dispatch = useAppDispatch()
+	const user = useAppSelector(selectUser)
+
+	const { data } = useGetAllTodosQuery(undefined, { skip: !user?.access_token })
+
+	const todosLength = data?.length
+	const shownTodos = filters.page * filters.limit
 
 	console.log(todosLength)
 	console.log(filters.limit)
@@ -57,7 +57,7 @@ const TodosFilters = () => {
 	}
 
 	const handleNextClick = () => {
-		if (todosLength !== filters.limit) return
+		if (todosLength! < filters.limit) return
 		dispatch(setPage(filters.page + 1))
 	}
 
@@ -99,7 +99,7 @@ const TodosFilters = () => {
 				<Button onClick={handlePreviousClick} disabled={filters.page === 1}>
 					Previous
 				</Button>
-				<Button onClick={handleNextClick} disabled={todosLength !== filters.limit}>
+				<Button onClick={handleNextClick} disabled={shownTodos >= todosLength!}>
 					Next
 				</Button>
 			</ButtonGroup>
