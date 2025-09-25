@@ -8,14 +8,14 @@ import * as React from 'react'
 
 import { useSnackbar } from 'notistack'
 
-import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
+import { useAppDispatch } from '../../../app/store.ts'
 import { useLocation, useNavigate } from 'react-router'
-import { selectUser, setUser } from '../../User/model/store/userStore.ts'
+import { setUser } from '../../User/model/store/userStore.ts'
 import { useLoginUserMutation } from '../../User/api/userApi.ts'
 import { object, string } from 'yup'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { autoLogin } from '../../../shared/util /autoLogin.ts'
+import useErrorHandler from '../../../shared/hooks/useErrorHandler.ts'
 
 const Login = () => {
 	const navigate = useNavigate()
@@ -36,7 +36,7 @@ const Login = () => {
 		event.preventDefault()
 	}
 
-	const [loginUser, { data, isLoading, isError, isSuccess }] = useLoginUserMutation()
+	const [loginUser, { data, isLoading, isError, isSuccess, error }] = useLoginUserMutation()
 
 	const loginSchema = object({
 		username: string().email({ message: 'Invalid email' }),
@@ -63,16 +63,7 @@ const Login = () => {
 		}
 	}, [data, isSuccess])
 
-	useEffect(() => {
-		if (isError) {
-			enqueueSnackbar('Login failed', { variant: 'error' })
-		}
-	}, [isError])
-
-	// const user = useAppSelector(selectUser)
-	// console.log(user, 'LOGIN STATE')
-	// const userFromLs = autoLogin()
-	// console.log(userFromLs, 'LOGIN USER FROM LS')
+	useErrorHandler({ isError, error, defaultMessage: 'Login error occurred' })
 
 	return (
 		<Container maxWidth={'sm'}>

@@ -14,6 +14,7 @@ import { useLoginUserMutation, useRegisterUserMutation } from '../../User/api/us
 import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import useErrorHandler from '../../../shared/hooks/useErrorHandler.ts'
 
 const Register = () => {
 	const navigate = useNavigate()
@@ -33,7 +34,7 @@ const Register = () => {
 	}
 
 	const [loginUser, { data: dataLogin, isSuccess: isSuccessLogin }] = useLoginUserMutation()
-	const [registerUser, { isError, isLoading }] = useRegisterUserMutation()
+	const [registerUser, { isError, isLoading, error }] = useRegisterUserMutation()
 
 	const registerSchema = z.object({
 		username: z.email({ message: 'Invalid email.' }),
@@ -63,11 +64,7 @@ const Register = () => {
 		}
 	}, [dataLogin, isSuccessLogin])
 
-	useEffect(() => {
-		if (isError) {
-			enqueueSnackbar('Registration failed', { variant: 'error' })
-		}
-	}, [isError])
+	useErrorHandler({ isError, error, defaultMessage: 'Login error occurred' })
 
 	return (
 		<Container maxWidth={'sm'}>
