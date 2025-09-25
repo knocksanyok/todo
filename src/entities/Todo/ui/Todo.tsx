@@ -1,5 +1,5 @@
 import type { TodoType } from '../model/todoType.ts'
-import { memo, type SyntheticEvent, useEffect, useState } from 'react'
+import { memo, type SyntheticEvent, useEffect, useRef, useState } from 'react'
 import { useSnackbar } from 'notistack'
 import { Card, CardActions, CardContent, Checkbox, TextField, CircularProgress } from '@mui/material'
 import Typography from '@mui/material/Typography'
@@ -14,6 +14,7 @@ import { NavLink } from 'react-router'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import useEditMode from '../../../shared/hooks/useEditMode.ts'
+import useDimensions from '../../../shared/hooks/useDemensions.ts'
 
 type TodoProps = {
 	todo: TodoType
@@ -22,6 +23,9 @@ type TodoProps = {
 export const Todo = memo(
 	({ todo }: TodoProps) => {
 		const { enqueueSnackbar } = useSnackbar()
+
+		const cardRef = useRef<HTMLDivElement>(null)
+		const { isMobile } = useDimensions(cardRef.current)
 
 		const [editedTitle, setEditedTitle] = useState(todo.title)
 		const [editedDescription, setEditedDescription] = useState(todo.description)
@@ -89,7 +93,7 @@ export const Todo = memo(
 
 		return (
 			<Card variant="outlined" sx={{ maxWidth: 200 }} ref={setNodeRef} style={style} {...attributes} {...listeners}>
-				<CardContent>
+				<CardContent ref={cardRef} sx={{ width: isMobile ? '100%' : 'auto', maxWidth: isMobile ? '100%' : 400 }}>
 					{isEditTitle ? (
 						<>
 							<Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
