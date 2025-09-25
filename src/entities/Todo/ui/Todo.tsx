@@ -13,6 +13,7 @@ import { useDeleteTodoQueryMutation, useUpdateTodoQueryMutation } from '../api/t
 import { NavLink } from 'react-router'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import useEditMode from '../../../shared/hooks/useEditMode.ts'
 
 type TodoProps = {
 	todo: TodoType
@@ -20,8 +21,6 @@ type TodoProps = {
 
 export const Todo = memo(
 	({ todo }: TodoProps) => {
-		const [isTitle, setIsTitle] = useState(true)
-		const [isDescription, setIsDescription] = useState(true)
 		const { enqueueSnackbar } = useSnackbar()
 
 		const [editedTitle, setEditedTitle] = useState(todo.title)
@@ -32,13 +31,10 @@ export const Todo = memo(
 
 		const dispatch = useAppDispatch()
 
-		const handleTitleChanger = () => {
-			setIsTitle(!isTitle)
-		}
-
-		const handleDescriptionChanger = () => {
-			setIsDescription(!isDescription)
-		}
+		const { handleTitleChange, handleDescriptionChange, isEditTitle, isEditDescription } = useEditMode({
+			initialTitleState: true,
+			initialDescriptionState: true,
+		})
 
 		const handleTitleChangerTextField = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
 			const newValue = e.currentTarget.value
@@ -71,14 +67,14 @@ export const Todo = memo(
 
 		const DoneEditTitle = () => {
 			updateTodoToBackend({ _id: todo._id, title: editedTitle })
-			setIsTitle(!isTitle)
+			handleTitleChange()
 			enqueueSnackbar('Заголовок успешно обновлен!', { variant: 'success' })
 		}
 
 		const DoneEditDescription = () => {
 			updateTodoToBackend({ _id: todo._id, description: editedDescription })
 			enqueueSnackbar('Заголовок успешно обновлен!', { variant: 'success' })
-			setIsDescription(!isDescription)
+			handleDescriptionChange()
 		}
 
 		useEffect(() => {
@@ -94,12 +90,12 @@ export const Todo = memo(
 		return (
 			<Card variant="outlined" sx={{ maxWidth: 200 }} ref={setNodeRef} style={style} {...attributes} {...listeners}>
 				<CardContent>
-					{isTitle ? (
+					{isEditTitle ? (
 						<>
 							<Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
 								<NavLink to={`/todo/${todo._id}`}>{todo.title}</NavLink>
 							</Typography>
-							<IconButton size="small" onClick={handleTitleChanger}>
+							<IconButton size="small" onClick={handleTitleChange}>
 								<ModeEditIcon fontSize="small" />
 							</IconButton>
 						</>
@@ -111,10 +107,10 @@ export const Todo = memo(
 							</IconButton>
 						</>
 					)}
-					{isDescription ? (
+					{isEditDescription ? (
 						<>
 							<Typography variant="body2">{todo.description}</Typography>
-							<IconButton size="small" onClick={handleDescriptionChanger}>
+							<IconButton size="small" onClick={handleDescriptionChange}>
 								<ModeEditIcon fontSize="small" />
 							</IconButton>
 						</>
