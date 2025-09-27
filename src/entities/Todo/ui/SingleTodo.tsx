@@ -78,7 +78,7 @@ const SingleTodo = () => {
 							<>
 								<Typography variant={'h4'}>{todo.title}</Typography>
 								<Typography>{todo.description}</Typography>
-								<IconButton size="small" onClick={handleEditMode}>
+								<IconButton data-testid="edit-button" size="small" onClick={handleEditMode}>
 									<ModeEditIcon fontSize="small" />
 								</IconButton>
 							</>
